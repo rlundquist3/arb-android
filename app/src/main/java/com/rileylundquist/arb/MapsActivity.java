@@ -55,14 +55,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onCameraChange(CameraPosition cameraPosition) {
         Log.d(DEBUG_STRING, "onCameraChange");
 
+        double midLatitude = (ARB_AREA.northeast.latitude + ARB_AREA.southwest.latitude)/2.0;
+        double midLongitude = (ARB_AREA.northeast.longitude + ARB_AREA.southwest.longitude)/2.0;
+
         // Reposition camera if leaving arb area
         if (cameraPosition.target.latitude > ARB_AREA.northeast.latitude)
-            mMap.animateCamera(CameraUpdateFactory.newLatLng(new LatLng(ARB_AREA.northeast.latitude, cameraPosition.target.longitude)));
-        else if (cameraPosition.target.latitude < ARB_AREA.southwest.latitude)
-            mMap.animateCamera(CameraUpdateFactory.newLatLng(new LatLng(ARB_AREA.southwest.latitude, cameraPosition.target.longitude)));
+            mMap.animateCamera(CameraUpdateFactory.newLatLng(new LatLng(ARB_AREA.northeast.latitude, midLongitude)));
+        if (cameraPosition.target.latitude < ARB_AREA.southwest.latitude)
+            mMap.animateCamera(CameraUpdateFactory.newLatLng(new LatLng(ARB_AREA.southwest.latitude, midLongitude)));
         if (cameraPosition.target.longitude > ARB_AREA.northeast.longitude)
-            mMap.animateCamera(CameraUpdateFactory.newLatLng(new LatLng(cameraPosition.target.latitude, ARB_AREA.northeast.longitude)));
-        else if (cameraPosition.target.latitude < ARB_AREA.southwest.longitude)
-            mMap.animateCamera(CameraUpdateFactory.newLatLng(new LatLng(cameraPosition.target.latitude, ARB_AREA.southwest.longitude)));
+            mMap.animateCamera(CameraUpdateFactory.newLatLng(new LatLng(midLatitude, ARB_AREA.northeast.longitude)));
+        if (cameraPosition.target.latitude < ARB_AREA.southwest.longitude)
+            mMap.animateCamera(CameraUpdateFactory.newLatLng(new LatLng(midLatitude, ARB_AREA.southwest.longitude)));
     }
 }
