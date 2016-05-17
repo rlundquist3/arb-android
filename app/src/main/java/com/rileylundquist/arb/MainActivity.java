@@ -17,10 +17,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.drive.realtime.internal.event.ObjectChangedDetails;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -29,21 +31,29 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, GoogleMap.OnCameraChangeListener {
 
     private GoogleMap mMap;
 
+    private final String DEBUG_STRING = "MAP";
     private final LatLng ARB_CENTER = new LatLng(42.293469, -85.701);
     private final LatLngBounds ARB_AREA = new LatLngBounds(new LatLng(42.285, -85.71), new LatLng(42.30, -85.69));
     private final int DEFAULT_ZOOM = 15;
 
-    private final String DEBUG_STRING = "MAP";
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
+    private List trails = new ArrayList<PolylineOptions>();
+
+
     private GoogleApiClient client;
 
     @Override
@@ -69,6 +79,8 @@ public class MainActivity extends AppCompatActivity
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+
+        setupTrails();
     }
 
     @Override
@@ -109,14 +121,14 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
+        if (id == R.id.show_trails) {
+            Toast.makeText(this, "show trails", Toast.LENGTH_SHORT);
 
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
+            if (!trails.isEmpty()) {
+                showTrails();
+            }
+        } else if (id == R.id.show_boundary) {
+            Toast.makeText(this, "show boundary", Toast.LENGTH_SHORT);
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {
@@ -207,5 +219,24 @@ public class MainActivity extends AppCompatActivity
         );
         AppIndex.AppIndexApi.end(client, viewAction);
         client.disconnect();
+    }
+
+    private void setupTrails() {
+        Log.d("DATA", "attempting to load trail data");
+        TrailReader reader = new TrailReader();
+        try {
+            trails = reader.readJsonStream(getResources().openRawResource(R.raw.arb_trails));
+        } catch (FileNotFoundException e) {
+            Log.d("IO", e.getClass().toString());
+        } catch (IOException e) {
+            Log.d("IO", e.getClass().toString());
+        }
+        Log.d("DATA", "trail data loaded: " + trails.size() + " trails");
+        Log.d("DATA", trails.toString());
+    }
+
+    private void showTrails() {
+        for (Object trail : trails)
+            mMap.addPolyline((PolylineOptions) trail);
     }
 }
