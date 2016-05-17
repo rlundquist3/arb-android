@@ -54,8 +54,8 @@ public class MainActivity extends AppCompatActivity
     private final LatLngBounds ARB_AREA = new LatLngBounds(new LatLng(42.285, -85.71), new LatLng(42.30, -85.69));
     private final int DEFAULT_ZOOM = 15;
 
-    private List trails = new ArrayList<PolylineOptions>();
     private List trailLines = new ArrayList<Polyline>();
+    private List boundaryLines = new ArrayList<Polyline>();
     private boolean trailsOn = false;
     private boolean boundaryOn = false;
 
@@ -132,7 +132,10 @@ public class MainActivity extends AppCompatActivity
             else if (!trailLines.isEmpty())
                 showTrails();
         } else if (id == R.id.show_boundary) {
-
+            if (boundaryOn)
+                hideBoundary();
+            else if (!boundaryLines.isEmpty())
+                showBoundary();
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {
@@ -166,6 +169,7 @@ public class MainActivity extends AppCompatActivity
         mMap.getUiSettings().setCompassEnabled(true);
 
         setupTrails();
+        setupBoundary();
     }
 
     @Override
@@ -228,13 +232,29 @@ public class MainActivity extends AppCompatActivity
 
     private void setupTrails() {
         Log.d("DATA", "attempting to load trail data");
-        TrailReader reader = new TrailReader();
+        DataReader reader = new DataReader();
         try {
-            trails = reader.readJsonStream(getResources().openRawResource(R.raw.arb_trails));
+            List trails = reader.readTrailData(getResources().openRawResource(R.raw.arb_trails));
             for (Object trail : trails)
                 trailLines.add(mMap.addPolyline(((PolylineOptions) trail).color(getResources().getColor(R.color.trailColor))));
             hideTrails();
             trails.clear();
+        } catch (FileNotFoundException e) {
+            Log.d("IO", e.getClass().toString());
+        } catch (IOException e) {
+            Log.d("IO", e.getClass().toString());
+        }
+    }
+
+    private void setupBoundary() {
+        Log.d("DATA", "attempting to load boundary data");
+        DataReader reader = new DataReader();
+        try {
+            List boundary = reader.readBoundaryData(getResources().openRawResource(R.raw.arb_boundary));
+            for (Object b : boundary)
+                boundaryLines.add(mMap.addPolyline(((PolylineOptions) b).color(getResources().getColor(R.color.boundaryColor))));
+            hideBoundary();
+            boundary.clear();
         } catch (FileNotFoundException e) {
             Log.d("IO", e.getClass().toString());
         } catch (IOException e) {
@@ -252,5 +272,17 @@ public class MainActivity extends AppCompatActivity
         for (Object trail : trailLines)
             ((Polyline) trail).setVisible(false);
         trailsOn = false;
+    }
+
+    private void showBoundary() {
+        for (Object boundary : boundaryLines)
+            ((Polyline) boundary).setVisible(true);
+        boundaryOn = true;
+    }
+
+    private void hideBoundary() {
+        for (Object boundary : boundaryLines)
+            ((Polyline) boundary).setVisible(false);
+        boundaryOn = false;
     }
 }
