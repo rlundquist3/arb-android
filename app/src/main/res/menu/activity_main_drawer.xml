@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <group android:checkableBehavior="all">
+    <!--group android:checkableBehavior="all"-->
         <item
             android:id="@+id/show_trails"
             android:icon="@drawable/ic_trails_24dp"
@@ -10,7 +10,7 @@
             android:id="@+id/show_boundary"
             android:icon="@drawable/ic_boundary_24dp"
             android:title="Boundary" />
-    </group>
+    <!--/group-->
 
     <item android:title="Communicate">
         <menu>

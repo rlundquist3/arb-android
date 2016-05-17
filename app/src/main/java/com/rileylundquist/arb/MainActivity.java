@@ -1,6 +1,7 @@
 package com.rileylundquist.arb;
 
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Process;
@@ -31,6 +32,7 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.io.File;
@@ -44,6 +46,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, GoogleMap.OnCameraChangeListener {
 
+    private GoogleApiClient client;
     private GoogleMap mMap;
 
     private final String DEBUG_STRING = "MAP";
@@ -52,9 +55,11 @@ public class MainActivity extends AppCompatActivity
     private final int DEFAULT_ZOOM = 15;
 
     private List trails = new ArrayList<PolylineOptions>();
+    private List trailLines = new ArrayList<Polyline>();
+    private boolean trailsOn = false;
+    private boolean boundaryOn = false;
 
-
-    private GoogleApiClient client;
+    private NavigationView navigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +74,7 @@ public class MainActivity extends AppCompatActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -80,7 +85,7 @@ public class MainActivity extends AppCompatActivity
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
 
-        setupTrails();
+
     }
 
     @Override
@@ -122,13 +127,12 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.show_trails) {
-            Toast.makeText(this, "show trails", Toast.LENGTH_SHORT);
-
-            if (!trails.isEmpty()) {
+            if (trailsOn)
+                hideTrails();
+            else if (!trailLines.isEmpty())
                 showTrails();
-            }
         } else if (id == R.id.show_boundary) {
-            Toast.makeText(this, "show boundary", Toast.LENGTH_SHORT);
+
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {
@@ -152,7 +156,6 @@ public class MainActivity extends AppCompatActivity
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.setOnCameraChangeListener(this);
-        mMap.addMarker(new MarkerOptions().position(ARB_CENTER).title("Arb Center"));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ARB_CENTER, DEFAULT_ZOOM));
         mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
         if (checkPermission(LOCATION_SERVICE, Process.myPid(), Process.myUid()) == PackageManager.PERMISSION_GRANTED) {
@@ -161,6 +164,8 @@ public class MainActivity extends AppCompatActivity
         }
         mMap.getUiSettings().setAllGesturesEnabled(true);
         mMap.getUiSettings().setCompassEnabled(true);
+
+        setupTrails();
     }
 
     @Override
@@ -226,17 +231,26 @@ public class MainActivity extends AppCompatActivity
         TrailReader reader = new TrailReader();
         try {
             trails = reader.readJsonStream(getResources().openRawResource(R.raw.arb_trails));
+            for (Object trail : trails)
+                trailLines.add(mMap.addPolyline(((PolylineOptions) trail).color(getResources().getColor(R.color.trailColor))));
+            hideTrails();
+            trails.clear();
         } catch (FileNotFoundException e) {
             Log.d("IO", e.getClass().toString());
         } catch (IOException e) {
             Log.d("IO", e.getClass().toString());
         }
-        Log.d("DATA", "trail data loaded: " + trails.size() + " trails");
-        Log.d("DATA", trails.toString());
     }
 
     private void showTrails() {
-        for (Object trail : trails)
-            mMap.addPolyline((PolylineOptions) trail);
+        for (Object trail : trailLines)
+            ((Polyline) trail).setVisible(true);
+        trailsOn = true;
+    }
+
+    private void hideTrails() {
+        for (Object trail : trailLines)
+            ((Polyline) trail).setVisible(false);
+        trailsOn = false;
     }
 }
