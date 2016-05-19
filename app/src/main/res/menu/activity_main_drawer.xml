@@ -4,6 +4,10 @@
     <item android:title="Map">
         <menu>
             <item
+                android:id="@+id/show_map"
+                android:icon="@drawable/ic_map_black_24px"
+                android:title="Show Map" />
+            <item
                 android:id="@+id/show_trails"
                 android:icon="@drawable/ic_trails_24dp"
                 android:title="Trails" />

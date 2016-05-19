@@ -10,6 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:text="@string/loading"
-        android:textColor="@color/k_grey" />
+        android:textColor="@color/k_grey"
+        android:padding="@dimen/full_width_text_margin" />
 
 </FrameLayout>

@@ -1,5 +1,6 @@
 package com.rileylundquist.arb;
 
+import android.content.ClipData;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
@@ -56,10 +57,17 @@ public class MainActivity extends AppCompatActivity
     private final LatLngBounds ARB_AREA = new LatLngBounds(new LatLng(42.285, -85.71), new LatLng(42.30, -85.69));
     private final int DEFAULT_ZOOM = 15;
 
+    private SupportMapFragment mapFragment;
+
     private List trailLines = new ArrayList<Polyline>();
     private List boundaryLines = new ArrayList<Polyline>();
     private boolean trailsOn = false;
     private boolean boundaryOn = false;
+
+    private enum Fragments {
+        MAP, ABOUT, CONTACT
+    }
+    private Fragments currentFragment = Fragments.MAP;
 
     private NavigationView navigationView;
 
@@ -80,7 +88,7 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+        mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         // ATTENTION: This was auto-generated to implement the App Indexing API.
@@ -125,7 +133,9 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-        if (id == R.id.show_trails) {
+        if (id == R.id.show_map) {
+            goToMap();
+        } else if (id == R.id.show_trails) {
             if (trailsOn)
                 hideTrails();
             else if (!trailLines.isEmpty())
@@ -286,6 +296,12 @@ public class MainActivity extends AppCompatActivity
         boundaryOn = false;
     }
 
+    private void goToMap() {
+        if (!currentFragment.equals(Fragments.MAP))
+            getSupportFragmentManager().popBackStack();
+        currentFragment = Fragments.MAP;
+    }
+
     private void goToAbout() {
         Log.d("S", "goToAbout");
         AboutFragment aboutFragment = new AboutFragment();
@@ -293,6 +309,8 @@ public class MainActivity extends AppCompatActivity
         transaction.replace(R.id.fragment_container, aboutFragment);
         transaction.addToBackStack(null);
         transaction.commit();
+
+        currentFragment = Fragments.ABOUT;
     }
 
     @Override
