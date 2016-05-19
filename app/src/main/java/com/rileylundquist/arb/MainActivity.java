@@ -8,6 +8,7 @@ import android.os.Process;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -44,7 +45,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, GoogleMap.OnCameraChangeListener {
+        implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback,
+        GoogleMap.OnCameraChangeListener, AboutFragment.OnFragmentInteractionListener {
 
     private GoogleApiClient client;
     private GoogleMap mMap;
@@ -84,8 +86,6 @@ public class MainActivity extends AppCompatActivity
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
-
-
     }
 
     @Override
@@ -125,7 +125,6 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-
         if (id == R.id.show_trails) {
             if (trailsOn)
                 hideTrails();
@@ -136,8 +135,8 @@ public class MainActivity extends AppCompatActivity
                 hideBoundary();
             else if (!boundaryLines.isEmpty())
                 showBoundary();
-        } else if (id == R.id.nav_share) {
-
+        } else if (id == R.id.nav_about) {
+            goToAbout();
         } else if (id == R.id.nav_send) {
 
         }
@@ -236,7 +235,7 @@ public class MainActivity extends AppCompatActivity
         try {
             List trails = reader.readTrailData(getResources().openRawResource(R.raw.arb_trails));
             for (Object trail : trails)
-                trailLines.add(mMap.addPolyline(((PolylineOptions) trail).color(getResources().getColor(R.color.trailColor))));
+                trailLines.add(mMap.addPolyline(((PolylineOptions) trail).color(getResources().getColor(R.color.k_aqua))));
             hideTrails();
             trails.clear();
         } catch (FileNotFoundException e) {
@@ -252,7 +251,7 @@ public class MainActivity extends AppCompatActivity
         try {
             List boundary = reader.readBoundaryData(getResources().openRawResource(R.raw.arb_boundary));
             for (Object b : boundary)
-                boundaryLines.add(mMap.addPolyline(((PolylineOptions) b).color(getResources().getColor(R.color.boundaryColor))));
+                boundaryLines.add(mMap.addPolyline(((PolylineOptions) b).color(getResources().getColor(R.color.k_purple))));
             hideBoundary();
             boundary.clear();
         } catch (FileNotFoundException e) {
@@ -263,6 +262,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void showTrails() {
+        Log.d(DEBUG_STRING, "show trails");
         for (Object trail : trailLines)
             ((Polyline) trail).setVisible(true);
         trailsOn = true;
@@ -284,5 +284,19 @@ public class MainActivity extends AppCompatActivity
         for (Object boundary : boundaryLines)
             ((Polyline) boundary).setVisible(false);
         boundaryOn = false;
+    }
+
+    private void goToAbout() {
+        Log.d("S", "goToAbout");
+        AboutFragment aboutFragment = new AboutFragment();
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, aboutFragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
+    }
+
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+        Log.d(DEBUG_STRING, "fragment interaction");
     }
 }

@@ -1,0 +1,15 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.rileylundquist.arb.AboutFragment"
+    android:background="@color/k_white">
+
+    <TextView
+        android:id="@+id/about_text"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="@string/loading"
+        android:textColor="@color/k_grey" />
+
+</FrameLayout>

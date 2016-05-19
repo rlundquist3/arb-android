@@ -4,6 +4,16 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
 
-    <color name="trailColor">#AA4DDBC8</color>
-    <color name="boundaryColor">#AA654E96</color>
+    <!-- Kalamazoo College Color Palette -->
+    <color name="k_white">#ffffff</color>
+    <color name="k_black">#000000</color>
+    <color name="k_grey">#837870</color>
+    <color name="k_orange">#EA6820</color>
+    <color name="k_green">#6A7F10</color>
+    <color name="k_lime">#A2B500</color>
+    <color name="k_yellow">#EFBD47</color>
+    <color name="k_red">#9E0E19</color>
+    <color name="k_aqua">#006983</color>
+    <color name="k_olive">#978700</color>
+    <color name="k_purple">#580162</color>
 </resources>
