@@ -10,4 +10,6 @@
     <string name="loading">Loading...</string>
 
     <string name="connection_error">Unable to connect</string>
+
+    <string name="contact_prompt">Fill out the form below to contact the arboretum manager with questions, comments, maintenance issues, etc.</string>
 </resources>

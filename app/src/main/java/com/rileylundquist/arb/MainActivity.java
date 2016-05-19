@@ -20,6 +20,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.appindexing.Action;
@@ -47,7 +49,8 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback,
-        GoogleMap.OnCameraChangeListener, AboutFragment.OnFragmentInteractionListener {
+        GoogleMap.OnCameraChangeListener, AboutFragment.OnFragmentInteractionListener,
+        ContactFragment.OnFragmentInteractionListener {
 
     private GoogleApiClient client;
     private GoogleMap mMap;
@@ -147,8 +150,8 @@ public class MainActivity extends AppCompatActivity
                 showBoundary();
         } else if (id == R.id.nav_about) {
             goToAbout();
-        } else if (id == R.id.nav_send) {
-
+        } else if (id == R.id.nav_contact) {
+            goToContact();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -303,7 +306,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void goToAbout() {
-        Log.d("S", "goToAbout");
         AboutFragment aboutFragment = new AboutFragment();
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_container, aboutFragment);
@@ -311,6 +313,16 @@ public class MainActivity extends AppCompatActivity
         transaction.commit();
 
         currentFragment = Fragments.ABOUT;
+    }
+
+    private void goToContact() {
+        ContactFragment contactFragment = new ContactFragment();
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, contactFragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
+
+        currentFragment = Fragments.CONTACT;
     }
 
     @Override

@@ -3,14 +3,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.rileylundquist.arb.AboutFragment"
-    android:background="@color/k_white">
+    android:background="@color/k_white"
+    android:padding="@dimen/full_width_text_margin" >
 
     <TextView
         android:id="@+id/about_text"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:text="@string/loading"
-        android:textColor="@color/k_grey"
-        android:padding="@dimen/full_width_text_margin" />
+        android:textColor="@color/k_grey" />
 
 </FrameLayout>
