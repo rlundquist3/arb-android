@@ -16,4 +16,6 @@
     <color name="k_aqua">#006983</color>
     <color name="k_olive">#978700</color>
     <color name="k_purple">#580162</color>
+
+    <color name="white_alpha">#aaffffff</color>
 </resources>

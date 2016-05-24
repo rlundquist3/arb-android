@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Process;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentActivity;
@@ -259,7 +260,8 @@ public class MainActivity extends AppCompatActivity
         transaction.commit();
 
         FrameLayout bottomSheet = (FrameLayout) findViewById(R.id.bottom_sheet);
-        bottomSheet.setVisibility(View.VISIBLE);
+        BottomSheetBehavior behavior = BottomSheetBehavior.from(bottomSheet);
+        behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
         return true;
     }
