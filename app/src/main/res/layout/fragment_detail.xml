@@ -1,0 +1,49 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".DetailFragment">
+
+    <ImageSwitcher
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:id="@+id/detail_image_switcher">
+
+    </ImageSwitcher>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:padding="24dp"
+        android:background="@color/k_green"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/detail_title"
+            android:textColor="@color/k_white"
+            android:textSize="24sp"
+            android:text="look at this"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/detail_title"
+            android:id="@+id/detail_subtitle"
+            android:textColor="@color/k_white"
+            android:textSize="14sp"
+            android:text="cool stuff and things"/>
+
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/detail_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="24dp"
+        android:text="@string/loading"
+        android:textColor="@color/k_grey" />
+
+</LinearLayout>

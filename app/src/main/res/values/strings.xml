@@ -12,4 +12,7 @@
     <string name="connection_error">Unable to connect</string>
 
     <string name="contact_prompt">Fill out the form below to contact the arboretum manager with questions, comments, maintenance issues, etc.</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

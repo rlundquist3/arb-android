@@ -22,6 +22,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.appindexing.Action;
@@ -35,6 +36,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
@@ -49,8 +51,9 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback,
-        GoogleMap.OnCameraChangeListener, AboutFragment.OnFragmentInteractionListener,
-        ContactFragment.OnFragmentInteractionListener {
+        GoogleMap.OnCameraChangeListener, GoogleMap.OnMarkerClickListener,
+        AboutFragment.OnFragmentInteractionListener, ContactFragment.OnFragmentInteractionListener,
+        DetailFragment.OnFragmentInteractionListener {
 
     private GoogleApiClient client;
     private GoogleMap mMap;
@@ -171,6 +174,7 @@ public class MainActivity extends AppCompatActivity
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.setOnCameraChangeListener(this);
+        mMap.setOnMarkerClickListener(this);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ARB_CENTER, DEFAULT_ZOOM));
         mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
         if (checkPermission(LOCATION_SERVICE, Process.myPid(), Process.myUid()) == PackageManager.PERMISSION_GRANTED) {
@@ -179,6 +183,10 @@ public class MainActivity extends AppCompatActivity
         }
         mMap.getUiSettings().setAllGesturesEnabled(true);
         mMap.getUiSettings().setCompassEnabled(true);
+
+        //Temporary
+        Marker marker = mMap.addMarker(new MarkerOptions()
+                .position(ARB_CENTER));
 
         setupTrails();
         setupBoundary();
@@ -240,6 +248,20 @@ public class MainActivity extends AppCompatActivity
         );
         AppIndex.AppIndexApi.end(client, viewAction);
         client.disconnect();
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        DetailFragment detailFragment = new DetailFragment();
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.bottom_sheet, detailFragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
+
+        FrameLayout bottomSheet = (FrameLayout) findViewById(R.id.bottom_sheet);
+        bottomSheet.setVisibility(View.VISIBLE);
+
+        return true;
     }
 
     private void setupTrails() {
