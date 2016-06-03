@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "39962868974",
+    "firebase_url": "https://massive-dryad-131314.firebaseio.com",
+    "project_id": "massive-dryad-131314",
+    "storage_bucket": "massive-dryad-131314.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:39962868974:android:514423fe58cd4cab",
+        "android_client_info": {
+          "package_name": "com.rileylundquist.arb"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "39962868974-jenalk6u1coljr4ode06l27gmpkmi5r5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBRBEH1wKJSZwm1aCTrw3RSeXw5Gw_GKks"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -4,6 +4,7 @@ import android.content.ClipData;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Process;
 import android.support.design.widget.BottomSheetBehavior;
@@ -25,6 +26,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.appindexing.Action;
@@ -154,6 +156,14 @@ public class MainActivity extends AppCompatActivity
                 hideBoundary();
             else if (!boundaryLines.isEmpty())
                 showBoundary();
+        } else if (id == R.id.show_benches) {
+            showCollection("benches");
+        } else if (id == R.id.show_bird_signs) {
+            showCollection("bird_signs");
+        } else if (id == R.id.show_herbaceous) {
+            showCollection("herbaceous");
+        } else if (id == R.id.show_herp_signs) {
+            showCollection("herp_signs");
         } else if (id == R.id.nav_about) {
             goToAbout();
         } else if (id == R.id.nav_contact) {
@@ -331,6 +341,10 @@ public class MainActivity extends AppCompatActivity
         currentFragment = Fragments.MAP;
     }
 
+    private void showCollection(String collection) {
+        new GetCollectionTask().execute(collection);
+    }
+
     private void goToAbout() {
         AboutFragment aboutFragment = new AboutFragment();
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -354,5 +368,24 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onFragmentInteraction(Uri uri) {
         Log.d(DEBUG_STRING, "fragment interaction");
+    }
+
+    private class GetCollectionTask extends AsyncTask<String, String, String> {
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                Log.d("S", "asyncTask trying server connection");
+                return ServerConnection.INSTANCE.getData(params[0]);
+            } catch (IOException e) {
+                Log.e("ERR", "Unable to connect to server");
+                return getString(R.string.connection_error);
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            Log.d(DEBUG_STRING, result);
+
+        }
     }
 }

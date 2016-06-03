@@ -17,6 +17,6 @@
         android:layout_height="wrap_content"
         android:paddingLeft="24dp"
         android:id="@+id/arb_logo"
-        android:src="@drawable/LAArboretum_K2012Stamp_2CHex"/>
+        android:src="@drawable/arb_logo"/>
 
 </LinearLayout>

@@ -43,6 +43,64 @@ public enum  ServerConnection {
 //        }
     }
 
+    public String getData(String collection) throws IOException {
+        try {
+            Log.d(TAG, "attempting connection");
+            URL url = new URL(BASE_URL + collection + "/");
+            Log.d(TAG, url.toString());
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            Log.d(TAG, conn.toString());
+            conn.setReadTimeout(10000);
+            conn.setConnectTimeout(15000);
+            conn.setRequestMethod("GET");
+            conn.setDoInput(true);
+            conn.connect();
+
+            int response = conn.getResponseCode();
+            Log.d(TAG, "Response code: " + response);
+
+            StringBuilder result = null;
+            try {
+                Log.d(TAG, "getting input stream");
+                InputStream in = new BufferedInputStream(conn.getInputStream());
+                BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                result = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    result.append(line);
+                }
+
+                Log.d("JSON Parser", "result: " + result.toString());
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            conn.disconnect();
+
+            JSONObject jObj = null;
+            try {
+                jObj = new JSONObject(result.toString());
+            } catch (JSONException e) {
+                Log.e("JSON Parser", "Error parsing data " + e.toString());
+            }
+
+            Log.d(TAG, jObj.toString());
+            return jObj.toString();
+//            try {
+//                return jObj.getString("text");
+//            } catch (JSONException e) {
+//                e.printStackTrace();
+//                return "Error fetching data";
+//            }
+
+
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        return "Error fetching data";
+    }
+
     public String getAbout() throws IOException {
         try {
             Log.d(TAG, "attempting connection");
