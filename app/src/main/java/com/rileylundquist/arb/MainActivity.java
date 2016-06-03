@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Process;
+import android.provider.ContactsContract;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -44,6 +45,11 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -62,6 +68,12 @@ public class MainActivity extends AppCompatActivity
     private GoogleApiClient client;
     private GoogleMap mMap;
 
+    private DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
+    private DatabaseReference mBenchesRef = mRootRef.child("benches");
+    private DatabaseReference mBirdSignsRef = mRootRef.child("bird_signs");
+    private DatabaseReference mHerbaceousRef = mRootRef.child("herbaceous");
+    private DatabaseReference mHerpSignsRef = mRootRef.child("herp_signs");
+
     private final String DEBUG_STRING = "MAP";
     private final LatLng ARB_CENTER = new LatLng(42.293469, -85.701);
     private final LatLngBounds ARB_AREA = new LatLngBounds(new LatLng(42.285, -85.71), new LatLng(42.30, -85.69));
@@ -71,8 +83,10 @@ public class MainActivity extends AppCompatActivity
 
     private List trailLines = new ArrayList<Polyline>();
     private List boundaryLines = new ArrayList<Polyline>();
+    private List benches = new ArrayList<Marker>();
     private boolean trailsOn = false;
     private boolean boundaryOn = false;
+    private boolean benchesOn = false;
 
     private enum Fragments {
         MAP, ABOUT, CONTACT
@@ -202,6 +216,7 @@ public class MainActivity extends AppCompatActivity
                 .position(ARB_CENTER));
 
         setupTrails();
+        showTrails();
         setupBoundary();
     }
 
@@ -241,6 +256,36 @@ public class MainActivity extends AppCompatActivity
                 Uri.parse("android-app://com.rileylundquist.arb/http/host/path")
         );
         AppIndex.AppIndexApi.start(client, viewAction);
+
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+        mBenchesRef.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                LatLng coords = new LatLng(dataSnapshot.child("Latitude").getValue(Double.class),
+                                            dataSnapshot.child("Longitude").getValue(Double.class));
+                benches.add(mMap.addMarker(new MarkerOptions().position(coords).visible(false)));
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     @Override
