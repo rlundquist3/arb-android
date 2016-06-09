@@ -68,11 +68,11 @@ public class MainActivity extends AppCompatActivity
     private GoogleApiClient client;
     private GoogleMap mMap;
 
-    private DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
-    private DatabaseReference mBenchesRef = mRootRef.child("benches");
-    private DatabaseReference mBirdSignsRef = mRootRef.child("bird_signs");
-    private DatabaseReference mHerbaceousRef = mRootRef.child("herbaceous");
-    private DatabaseReference mHerpSignsRef = mRootRef.child("herp_signs");
+    private DatabaseReference mRootRef;
+    private DatabaseReference mBenchesRef;
+    private DatabaseReference mBirdSignsRef;
+    private DatabaseReference mHerbaceousRef;
+    private DatabaseReference mHerpSignsRef;
 
     private final String DEBUG_STRING = "MAP";
     private final LatLng ARB_CENTER = new LatLng(42.293469, -85.701);
@@ -119,6 +119,13 @@ public class MainActivity extends AppCompatActivity
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+        mRootRef = FirebaseDatabase.getInstance().getReference();
+        mBenchesRef = mRootRef.child("benches");
+        mBirdSignsRef = mRootRef.child("bird_signs");
+        mHerbaceousRef = mRootRef.child("herbaceous");
+        mHerpSignsRef = mRootRef.child("herp_signs");
     }
 
     @Override
@@ -171,7 +178,7 @@ public class MainActivity extends AppCompatActivity
             else if (!boundaryLines.isEmpty())
                 showBoundary();
         } else if (id == R.id.show_benches) {
-            showCollection("benches");
+            showBenches();
         } else if (id == R.id.show_bird_signs) {
             showCollection("bird_signs");
         } else if (id == R.id.show_herbaceous) {
@@ -257,7 +264,7 @@ public class MainActivity extends AppCompatActivity
         );
         AppIndex.AppIndexApi.start(client, viewAction);
 
-        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+
         mBenchesRef.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -268,12 +275,15 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
+                LatLng coords = new LatLng(dataSnapshot.child("Latitude").getValue(Double.class),
+                        dataSnapshot.child("Longitude").getValue(Double.class));
+                Marker bench = (Marker) benches.get(dataSnapshot.child("FID").getValue(Integer.class));
+                bench.setPosition(coords);
             }
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
-
+                benches.remove(dataSnapshot.child("FID").getValue(Integer.class));
             }
 
             @Override
@@ -387,7 +397,12 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void showCollection(String collection) {
-        new GetCollectionTask().execute(collection);
+
+    }
+
+    private void showBenches() {
+        for (Object b : benches)
+            ((Marker) b).setVisible(true);
     }
 
     private void goToAbout() {
