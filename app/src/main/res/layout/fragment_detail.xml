@@ -10,13 +10,6 @@
         android:orientation="vertical"
         android:background="@color/white_alpha">
 
-        <ImageSwitcher
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:id="@+id/detail_image_switcher">
-
-        </ImageSwitcher>
-
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="120dp"
@@ -42,6 +35,13 @@
                 android:text="cool stuff and things"/>
 
         </RelativeLayout>
+
+        <ImageSwitcher
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:id="@+id/detail_image_switcher">
+
+        </ImageSwitcher>
 
         <TextView
             android:id="@+id/detail_info"

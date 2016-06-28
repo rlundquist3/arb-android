@@ -18,7 +18,7 @@
         </menu>
     </item>
 
-    <item android:title="Map">
+    <item android:title="What to See">
         <menu>
             <item
                 android:id="@+id/show_benches"

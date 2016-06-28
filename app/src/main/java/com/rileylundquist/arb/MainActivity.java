@@ -1,18 +1,26 @@
 package com.rileylundquist.arb;
 
+import android.*;
+import android.Manifest;
 import android.content.ClipData;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Process;
 import android.provider.ContactsContract;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -32,12 +40,17 @@ import android.widget.Toast;
 
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.drive.realtime.internal.event.ObjectChangedDetails;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -62,11 +75,22 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback,
         GoogleMap.OnCameraChangeListener, GoogleMap.OnMarkerClickListener,
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
         AboutFragment.OnFragmentInteractionListener, ContactFragment.OnFragmentInteractionListener,
-        DetailFragment.OnFragmentInteractionListener {
+        DetailFragment.OnFragmentInteractionListener, LocationListener {
 
-    private GoogleApiClient client;
+    public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 10000;
+    public static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS =
+            UPDATE_INTERVAL_IN_MILLISECONDS / 2;
+
+    private GoogleApiClient mGoogleApiClient;
     private GoogleMap mMap;
+
+    protected LocationRequest mLocationRequest;
+    protected Location mCurrentLocation;
+    protected Location mLastLocation;
+    protected Marker mCurrLocationMarker;
+    protected LatLng latLng;
 
     private DatabaseReference mRootRef;
     private DatabaseReference mBenchesRef;
@@ -88,9 +112,60 @@ public class MainActivity extends AppCompatActivity
     private boolean boundaryOn = false;
     private boolean benchesOn = false;
 
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        Toast.makeText(this, "onConnected", Toast.LENGTH_SHORT).show();
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                mGoogleApiClient);
+        if (mLastLocation != null) {
+            //place marker at current position
+            mMap.clear();
+            latLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+            MarkerOptions markerOptions = new MarkerOptions();
+            markerOptions.position(latLng);
+            markerOptions.title("Current Position");
+            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
+            mCurrLocationMarker = mMap.addMarker(markerOptions);
+        }
+
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(5000); //5 seconds
+        mLocationRequest.setFastestInterval(3000); //3 seconds
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+        //mLocationRequest.setSmallestDisplacement(0.1F); //1/10 meter
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+        }
+
+//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//            // TODO: Consider calling
+//            //    ActivityCompat#requestPermissions
+//            // here to request the missing permissions, and then overriding
+//            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+//            //                                          int[] grantResults)
+//            // to handle the case where the user grants the permission. See the documentation
+//            // for ActivityCompat#requestPermissions for more details.
+//            return;
+//        }
+//        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        Toast.makeText(this, "onConnectionSuspended", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Toast.makeText(this, "onConnectionFailed", Toast.LENGTH_SHORT).show();
+    }
+
     private enum Fragments {
         MAP, ABOUT, CONTACT
     }
+
     private Fragments currentFragment = Fragments.MAP;
 
     private NavigationView navigationView;
@@ -118,7 +193,12 @@ public class MainActivity extends AppCompatActivity
         mapFragment.getMapAsync(this);
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
-        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+//        mGoogleApiClient = new GoogleApiClient.Builder(this)
+//                .addApi(AppIndex.API)
+//                .addApi(LocationServices.API)
+//                .build();
+//        createLocationRequest();
+        buildGoogleApiClient();
 
         FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         mRootRef = FirebaseDatabase.getInstance().getReference();
@@ -126,6 +206,8 @@ public class MainActivity extends AppCompatActivity
         mBirdSignsRef = mRootRef.child("bird_signs");
         mHerbaceousRef = mRootRef.child("herbaceous");
         mHerpSignsRef = mRootRef.child("herp_signs");
+
+        startLocationUpdates();
     }
 
     @Override
@@ -178,7 +260,10 @@ public class MainActivity extends AppCompatActivity
             else if (!boundaryLines.isEmpty())
                 showBoundary();
         } else if (id == R.id.show_benches) {
-            showBenches();
+            if (benchesOn)
+                hideBenches();
+            else if (!benches.isEmpty())
+                showBenches();
         } else if (id == R.id.show_bird_signs) {
             showCollection("bird_signs");
         } else if (id == R.id.show_herbaceous) {
@@ -211,10 +296,38 @@ public class MainActivity extends AppCompatActivity
         mMap.setOnMarkerClickListener(this);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ARB_CENTER, DEFAULT_ZOOM));
         mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
-        if (checkPermission(LOCATION_SERVICE, Process.myPid(), Process.myUid()) == PackageManager.PERMISSION_GRANTED) {
-            mMap.setMyLocationEnabled(true);
-            mMap.getUiSettings().setMyLocationButtonEnabled(true);
+//        if (checkPermission(LOCATION_SERVICE, Process.myPid(), Process.myUid()) == PackageManager.PERMISSION_GRANTED) {
+//            Log.d("X", "location enabled");
+//            mMap.setMyLocationEnabled(true);
+//            mMap.getUiSettings().setMyLocationButtonEnabled(true);
+//        }
+
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ContextCompat.checkSelfPermission(this,
+                    Manifest.permission.ACCESS_FINE_LOCATION)
+                    == PackageManager.PERMISSION_GRANTED) {
+//                buildGoogleApiClient();
+                mMap.setMyLocationEnabled(true);
+            }
         }
+        else {
+//            buildGoogleApiClient();
+            mMap.setMyLocationEnabled(true);
+        }
+
+//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//            // TODO: Consider calling
+//            //    ActivityCompat#requestPermissions
+//            // here to request the missing permissions, and then overriding
+//            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+//            //                                          int[] grantResults)
+//            // to handle the case where the user grants the permission. See the documentation
+//            // for ActivityCompat#requestPermissions for more details.
+//            return;
+//        }
+//        mMap.setMyLocationEnabled(true);
+        mMap.getUiSettings().setMyLocationButtonEnabled(true);
+
         mMap.getUiSettings().setAllGesturesEnabled(true);
         mMap.getUiSettings().setCompassEnabled(true);
 
@@ -225,6 +338,141 @@ public class MainActivity extends AppCompatActivity
         setupTrails();
         showTrails();
         setupBoundary();
+    }
+
+    protected synchronized void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+        mGoogleApiClient.connect();
+        createLocationRequest();
+    }
+
+    protected void startLocationUpdates() {
+        if (getPackageManager().checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION, getPackageName()) == PackageManager.PERMISSION_GRANTED ||
+                getPackageManager().checkPermission(Manifest.permission.ACCESS_FINE_LOCATION, getPackageName()) == PackageManager.PERMISSION_GRANTED)
+            LocationServices.FusedLocationApi.requestLocationUpdates(
+                    mGoogleApiClient, mLocationRequest, this);
+    }
+
+    protected void createLocationRequest() {
+        mLocationRequest = new LocationRequest();
+
+        // Sets the desired interval for active location updates. This interval is
+        // inexact. You may not receive updates at all if no location sources are available, or
+        // you may receive them slower than requested. You may also receive updates faster than
+        // requested if other applications are requesting location at a faster interval.
+        mLocationRequest.setInterval(UPDATE_INTERVAL_IN_MILLISECONDS);
+
+        // Sets the fastest rate for active location updates. This interval is exact, and your
+        // application will never receive updates faster than this value.
+        mLocationRequest.setFastestInterval(FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS);
+
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+//        if (currLocationMarker != null) {
+//            currLocationMarker.remove();
+//        }
+//        latLng = new LatLng(location.getLatitude(), location.getLongitude());
+//        MarkerOptions markerOptions = new MarkerOptions();
+//        markerOptions.position(latLng);
+//        markerOptions.title("Current Position");
+//        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
+//        currLocationMarker = mMap.addMarker(markerOptions);
+//        Snackbar.make(mapFragment.getView(), "location updated: " + location.toString(), Snackbar.LENGTH_LONG).show();
+        mLastLocation = location;
+        if (mCurrLocationMarker != null) {
+            mCurrLocationMarker.remove();
+        }
+
+        //Place current location marker
+        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.position(latLng);
+        markerOptions.title("Current Position");
+        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
+        mCurrLocationMarker = mMap.addMarker(markerOptions);
+
+        //move map camera
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(11));
+
+        //stop location updates
+        if (mGoogleApiClient != null) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+        }
+    }
+
+    public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
+    public boolean checkLocationPermission(){
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.ACCESS_FINE_LOCATION)) {
+
+                // Show an expanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+
+                //Prompt the user once explanation has been shown
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        MY_PERMISSIONS_REQUEST_LOCATION);
+
+
+            } else {
+                // No explanation needed, we can request the permission.
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        MY_PERMISSIONS_REQUEST_LOCATION);
+            }
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_LOCATION: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+                    if (ContextCompat.checkSelfPermission(this,
+                            Manifest.permission.ACCESS_FINE_LOCATION)
+                            == PackageManager.PERMISSION_GRANTED) {
+
+                        if (mGoogleApiClient == null) {
+                            buildGoogleApiClient();
+                        }
+                        mMap.setMyLocationEnabled(true);
+                    }
+
+                } else {
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                    Toast.makeText(this, "permission denied", Toast.LENGTH_LONG).show();
+                }
+                return;
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
     }
 
     @Override
@@ -251,7 +499,7 @@ public class MainActivity extends AppCompatActivity
 
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
-        client.connect();
+        mGoogleApiClient.connect();
         Action viewAction = Action.newAction(
                 Action.TYPE_VIEW, // TODO: choose an action type.
                 "Maps Page", // TODO: Define a title for the content shown.
@@ -262,8 +510,7 @@ public class MainActivity extends AppCompatActivity
                 // TODO: Make sure this auto-generated app URL is correct.
                 Uri.parse("android-app://com.rileylundquist.arb/http/host/path")
         );
-        AppIndex.AppIndexApi.start(client, viewAction);
-
+//        AppIndex.AppIndexApi.start(mGoogleApiClient, viewAction);
 
         mBenchesRef.addChildEventListener(new ChildEventListener() {
             @Override
@@ -314,8 +561,8 @@ public class MainActivity extends AppCompatActivity
                 // TODO: Make sure this auto-generated app URL is correct.
                 Uri.parse("android-app://com.rileylundquist.arb/http/host/path")
         );
-        AppIndex.AppIndexApi.end(client, viewAction);
-        client.disconnect();
+        AppIndex.AppIndexApi.end(mGoogleApiClient, viewAction);
+        mGoogleApiClient.disconnect();
     }
 
     @Override
@@ -340,6 +587,8 @@ public class MainActivity extends AppCompatActivity
             List trails = reader.readTrailData(getResources().openRawResource(R.raw.arb_trails));
             for (Object trail : trails)
                 trailLines.add(mMap.addPolyline(((PolylineOptions) trail).color(getResources().getColor(R.color.k_aqua))));
+//            for (Object line : trailLines)
+//                ((Polyline) line)
             hideTrails();
             trails.clear();
         } catch (FileNotFoundException e) {
@@ -398,11 +647,17 @@ public class MainActivity extends AppCompatActivity
 
     private void showCollection(String collection) {
 
+
     }
 
     private void showBenches() {
         for (Object b : benches)
             ((Marker) b).setVisible(true);
+    }
+
+    private void hideBenches() {
+        for (Object b : benches)
+            ((Marker) b).setVisible(false);
     }
 
     private void goToAbout() {
