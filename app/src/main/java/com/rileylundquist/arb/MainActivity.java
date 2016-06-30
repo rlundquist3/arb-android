@@ -5,6 +5,7 @@ import android.Manifest;
 import android.app.SearchManager;
 import android.content.ClipData;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -114,6 +115,11 @@ public class MainActivity extends AppCompatActivity
     private boolean trailsOn = false;
     private boolean boundaryOn = false;
     private boolean benchesOn = false;
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    private GoogleApiClient client;
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
@@ -180,6 +186,8 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        handleIntent(getIntent());
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -211,6 +219,22 @@ public class MainActivity extends AppCompatActivity
         mHerpSignsRef = mRootRef.child("herp_signs");
 
         startLocationUpdates();
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        handleIntent(intent);
+    }
+
+    private void handleIntent(Intent intent) {
+
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            String query = intent.getStringExtra(SearchManager.QUERY);
+            //use the query to search your data somehow
+        }
     }
 
     @Override
@@ -248,6 +272,9 @@ public class MainActivity extends AppCompatActivity
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        } else if (id == R.id.search) {
+            Intent intent = new Intent(this, SearchActivity.class);
+            startActivityForResult(intent, 1);
         }
 
         return super.onOptionsItemSelected(item);
@@ -313,15 +340,14 @@ public class MainActivity extends AppCompatActivity
 //            mMap.getUiSettings().setMyLocationButtonEnabled(true);
 //        }
 
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ContextCompat.checkSelfPermission(this,
                     Manifest.permission.ACCESS_FINE_LOCATION)
                     == PackageManager.PERMISSION_GRANTED) {
 //                buildGoogleApiClient();
                 mMap.setMyLocationEnabled(true);
             }
-        }
-        else {
+        } else {
 //            buildGoogleApiClient();
             mMap.setMyLocationEnabled(true);
         }
@@ -420,7 +446,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
-    public boolean checkLocationPermission(){
+
+    public boolean checkLocationPermission() {
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -507,6 +534,9 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onStart() {
         super.onStart();
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client.connect();
 
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -527,7 +557,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 LatLng coords = new LatLng(dataSnapshot.child("Latitude").getValue(Double.class),
-                                            dataSnapshot.child("Longitude").getValue(Double.class));
+                        dataSnapshot.child("Longitude").getValue(Double.class));
                 benches.add(mMap.addMarker(new MarkerOptions().position(coords).visible(false)));
             }
 
@@ -554,11 +584,37 @@ public class MainActivity extends AppCompatActivity
 
             }
         });
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        Action viewAction2 = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "Main Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app URL is correct.
+                Uri.parse("android-app://com.rileylundquist.arb/http/host/path")
+        );
+        AppIndex.AppIndexApi.start(client, viewAction2);
     }
 
     @Override
     public void onStop() {
         super.onStop();
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        Action viewAction2 = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "Main Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app URL is correct.
+                Uri.parse("android-app://com.rileylundquist.arb/http/host/path")
+        );
+        AppIndex.AppIndexApi.end(client, viewAction2);
 
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -574,6 +630,9 @@ public class MainActivity extends AppCompatActivity
         );
         AppIndex.AppIndexApi.end(mGoogleApiClient, viewAction);
         mGoogleApiClient.disconnect();
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client.disconnect();
     }
 
     @Override

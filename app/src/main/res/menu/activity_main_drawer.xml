@@ -18,7 +18,7 @@
         </menu>
     </item>
 
-    <item android:title="What to See">
+    <item android:title="[temp]">
         <menu>
             <item
                 android:id="@+id/show_benches"
@@ -39,12 +39,16 @@
         </menu>
     </item>
 
-    <item android:title="Tools">
+    <item android:title="Info">
         <menu>
             <item
                 android:id="@+id/nav_about"
                 android:icon="@drawable/ic_info_black_24dp"
                 android:title="About" />
+            <item
+                android:id="@+id/nav_guidelines"
+                android:icon="@drawable/ic_gavel_black_24dp"
+                android:title="Guidlelines" />
             <item
                 android:id="@+id/nav_contact"
                 android:icon="@drawable/ic_email_black_24dp"
