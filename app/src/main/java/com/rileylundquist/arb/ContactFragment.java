@@ -1,6 +1,7 @@
 package com.rileylundquist.arb;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -107,39 +108,11 @@ public class ContactFragment extends Fragment implements Button.OnClickListener 
 
     @Override
     public void onClick(View v) {
-        String name = ((EditText) getActivity().findViewById(R.id.contact_name)).getText().toString();
-        String email = ((EditText) getActivity().findViewById(R.id.contact_email)).getText().toString();
-        String message = ((EditText) getActivity().findViewById(R.id.contact_message)).getText().toString();
-
-        ConnectivityManager connMgr = (ConnectivityManager)
-                getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-        if (networkInfo != null && networkInfo.isConnected()) {
-            new SendMessageTask().execute(name, email, message);
-        } else {
-            Log.e("S", "no connection");
-        }
-    }
-
-    private class SendMessageTask extends AsyncTask<String, Void, String> {
-        @Override
-        protected String doInBackground(String... params) {
-            try {
-                Log.d("S", "asyncTask trying server connection");
-                return Boolean.toString(ServerConnection.INSTANCE.sendEmail(params[0], params[1], params[2]));
-            } catch (IOException e) {
-                Log.e("ERR", "Unable to connect to server");
-                return Boolean.toString(false);
-            }
-        }
-
-        @Override
-        protected void onPostExecute(String sent) {
-            if (Boolean.getBoolean(sent))
-                Snackbar.make(getView(), "Message sent", Snackbar.LENGTH_LONG);
-            else
-                Snackbar.make(getView(), "Send failed, try again later", Snackbar.LENGTH_LONG);
-        }
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("plain/text");
+        intent.putExtra(Intent.EXTRA_EMAIL, new String[] {getString(R.string.contact_email)});
+        intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.contact_subject));
+        startActivity(Intent.createChooser(intent, ""));
     }
 
     /**

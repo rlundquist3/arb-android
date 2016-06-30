@@ -14,7 +14,8 @@
 
     <string name="connection_error">Unable to connect</string>
 
-    <string name="contact_prompt">Fill out the form below to contact the arboretum manager with questions, comments, maintenance issues, etc.</string>
-
+    <string name="contact_prompt">Send a message to arboretum@kzoo.edu to contact the arboretum manager with questions, comments, maintenance issues, etc.</string>
+    <string name="contact_email">arboretum@kzoo.edu</string>
+    <string name="contact_subject">Message from Arb App</string>
     <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis volutpat placerat dolor, in iaculis tellus hendrerit ac. Ut in varius arcu. Donec ut magna at diam sodales volutpat. Aenean quam lectus, condimentum vitae enim eu, tempor ornare diam. Phasellus sed tortor ac odio commodo gravida. Nulla aliquam ipsum nec velit ornare sodales. In vel tempor dolor, id convallis dui. Ut malesuada euismod ligula, sed interdum massa dictum vel. Curabitur magna purus, condimentum in eros quis, sollicitudin tempor diam. Phasellus non aliquet libero. Morbi tortor tortor, accumsan sed elementum non, hendrerit in sapien. Phasellus eu orci rutrum, placerat dui quis, venenatis nulla. Fusce quis sagittis leo, imperdiet interdum nisl. Sed tincidunt elit et nibh iaculis eleifend. Praesent semper cursus ante, eget commodo diam tristique nec.\n\nFusce consequat lorem sit amet lacus interdum aliquet. Nulla vehicula eros ex, fringilla sagittis justo auctor id. Integer placerat mi at enim fermentum lobortis. Maecenas sed mauris placerat, aliquam ex pharetra, euismod urna. Morbi mattis malesuada purus. Nam nec magna dui. Mauris ultrices velit eu urna placerat placerat. Praesent aliquam mi ipsum, id accumsan odio euismod quis. Nulla hendrerit vulputate ullamcorper. Phasellus ornare sapien libero, vitae posuere nisl cursus et. Cras pharetra tincidunt imperdiet. Morbi volutpat felis vel aliquam laoreet. Aenean venenatis sed velit non egestas.</string>
 </resources>
