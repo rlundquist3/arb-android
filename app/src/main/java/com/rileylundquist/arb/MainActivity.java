@@ -663,7 +663,7 @@ public class MainActivity extends AppCompatActivity
         try {
             List boundary = reader.readBoundaryData(getResources().openRawResource(R.raw.arb_boundary));
             for (Object b : boundary)
-                boundaryLines.add(mMap.addPolyline(((PolylineOptions) b).color(getResources().getColor(R.color.k_purple))));
+                boundaryLines.add(mMap.addPolyline(((PolylineOptions) b).color(getResources().getColor(R.color.k_lime))));
             hideBoundary();
             boundary.clear();
         } catch (FileNotFoundException e) {
