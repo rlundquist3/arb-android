@@ -1,52 +1,39 @@
 package com.rileylundquist.arb;
 
-import android.*;
 import android.Manifest;
 import android.app.SearchManager;
-import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Process;
-import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.SearchView;
-import android.util.Log;
-import android.view.View;
-import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.drive.realtime.internal.event.ObjectChangedDetails;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -68,20 +55,20 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+
+import menu.GuidelinesFragment;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback,
         GoogleMap.OnCameraChangeListener, GoogleMap.OnMarkerClickListener,
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
         AboutFragment.OnFragmentInteractionListener, ContactFragment.OnFragmentInteractionListener,
-        DetailFragment.OnFragmentInteractionListener, LocationListener {
+        DetailFragment.OnFragmentInteractionListener, GuidelinesFragment.OnFragmentInteractionListener,
+        LocationListener {
 
     public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 10000;
     public static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS =
@@ -172,7 +159,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private enum Fragments {
-        MAP, ABOUT, CONTACT
+        MAP, ABOUT, CONTACT, GUIDELINES
     }
 
     private Fragments currentFragment = Fragments.MAP;
@@ -310,6 +297,8 @@ public class MainActivity extends AppCompatActivity
             showCollection("herp_signs");
         } else if (id == R.id.nav_about) {
             goToAbout();
+        } else if (id == R.id.nav_guidelines) {
+            goToGuidelines();
         } else if (id == R.id.nav_contact) {
             goToContact();
         }
@@ -738,6 +727,16 @@ public class MainActivity extends AppCompatActivity
         transaction.commit();
 
         currentFragment = Fragments.ABOUT;
+    }
+
+    private void goToGuidelines() {
+        GuidelinesFragment guidelinesFragment = new GuidelinesFragment();
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, guidelinesFragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
+
+        currentFragment = Fragments.GUIDELINES;
     }
 
     private void goToContact() {
