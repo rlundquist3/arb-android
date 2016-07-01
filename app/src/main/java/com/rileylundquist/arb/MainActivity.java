@@ -67,6 +67,7 @@ import menu.GuidelinesFragment;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback,
         GoogleMap.OnCameraChangeListener, GoogleMap.OnMarkerClickListener, GoogleMap.OnMyLocationButtonClickListener,
+        GoogleMap.OnPolylineClickListener,
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
         AboutFragment.OnFragmentInteractionListener, ContactFragment.OnFragmentInteractionListener,
         DetailFragment.OnFragmentInteractionListener, GuidelinesFragment.OnFragmentInteractionListener,
@@ -80,9 +81,7 @@ public class MainActivity extends AppCompatActivity
     private GoogleMap mMap;
 
     protected LocationRequest mLocationRequest;
-    protected Location mCurrentLocation;
     protected Location mLastLocation;
-    protected LatLng latLng;
 
     private DatabaseReference mRootRef;
     private DatabaseReference mBenchesRef;
@@ -97,7 +96,10 @@ public class MainActivity extends AppCompatActivity
 
     private SupportMapFragment mapFragment;
 
+    private ThingsNearby mThingsNearby = new ThingsNearby();
+    private List mNearbyMarkers = new ArrayList<Marker>();
     private List trailLines = new ArrayList<Polyline>();
+    private List mTrailNames = new ArrayList<String>();
     private List boundaryLines = new ArrayList<Polyline>();
     private List benches = new ArrayList<Marker>();
     private boolean trailsOn = false;
@@ -106,7 +108,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        Toast.makeText(this, "onConnected", Toast.LENGTH_SHORT).show();
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
 
@@ -150,6 +151,11 @@ public class MainActivity extends AppCompatActivity
         return false;
     }
 
+    @Override
+    public void onPolylineClick(Polyline polyline) {
+
+    }
+
     private enum Fragments {
         MAP, ABOUT, CONTACT, GUIDELINES
     }
@@ -187,9 +193,9 @@ public class MainActivity extends AppCompatActivity
         FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         mRootRef = FirebaseDatabase.getInstance().getReference();
         mBenchesRef = mRootRef.child("benches");
-        mBirdSignsRef = mRootRef.child("bird_signs");
+        mBirdSignsRef = mRootRef.child("bird-signs");
         mHerbaceousRef = mRootRef.child("herbaceous");
-        mHerpSignsRef = mRootRef.child("herp_signs");
+        mHerpSignsRef = mRootRef.child("herp-signs");
     }
 
     @Override
@@ -299,7 +305,6 @@ public class MainActivity extends AppCompatActivity
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        Log.d("MAP", "on map ready");
         mMap = googleMap;
         mMap.setOnCameraChangeListener(this);
         mMap.setOnMarkerClickListener(this);
@@ -326,9 +331,7 @@ public class MainActivity extends AppCompatActivity
         Marker marker = mMap.addMarker(new MarkerOptions()
                 .position(ARB_CENTER));
 
-        Log.d("MAP", "set up trails");
         setupTrails();
-        showTrails();
         setupBoundary();
     }
 
@@ -344,8 +347,9 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onLocationChanged(Location location) {
-        Snackbar.make(mapFragment.getView(), "location updated: " + location.toString(), Snackbar.LENGTH_LONG).show();
         mLastLocation = location;
+        mThingsNearby.update(mMap, location);
+        mNearbyMarkers = mThingsNearby.getNearby();
 
 //        //stop location updates
 //        if (mGoogleApiClient != null) {
@@ -558,9 +562,15 @@ public class MainActivity extends AppCompatActivity
         DataReader reader = new DataReader();
         try {
             List trails = reader.readTrailData(getResources().openRawResource(R.raw.arb_trails));
-            for (Object trail : trails)
-                trailLines.add(mMap.addPolyline(((PolylineOptions) trail).color(getResources().getColor(R.color.k_aqua))));
-            hideTrails();
+            for (Object trail : trails) {
+                trailLines.add(mMap.addPolyline(((PolylineOptions) trail)
+                        .color(getResources().getColor(R.color.k_aqua))));
+
+//                mTrailNames.add("Trail " + Integer.toString(trailLines.size()));
+//                mMap.addMarker(new MarkerOptions()
+//                        .title((String) mTrailNames.get(mTrailNames.size()-1))
+//                        .position(((Polyline) trailLines.get(trailLines.size()-1)).getPoints().get(0)));
+            }
             trails.clear();
         } catch (FileNotFoundException e) {
             Log.d("IO", e.getClass().toString());
