@@ -14,6 +14,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
@@ -81,7 +82,6 @@ public class MainActivity extends AppCompatActivity
     protected LocationRequest mLocationRequest;
     protected Location mCurrentLocation;
     protected Location mLastLocation;
-    protected Marker mCurrLocationMarker;
     protected LatLng latLng;
 
     private DatabaseReference mRootRef;
@@ -109,16 +109,6 @@ public class MainActivity extends AppCompatActivity
         Toast.makeText(this, "onConnected", Toast.LENGTH_SHORT).show();
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
-        if (mLastLocation != null) {
-            //place marker at current position
-            mMap.clear();
-            latLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-            MarkerOptions markerOptions = new MarkerOptions();
-            markerOptions.position(latLng);
-            markerOptions.title("Current Position");
-            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
-            mCurrLocationMarker = mMap.addMarker(markerOptions);
-        }
 
         mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(5000);
@@ -309,6 +299,7 @@ public class MainActivity extends AppCompatActivity
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        Log.d("MAP", "on map ready");
         mMap = googleMap;
         mMap.setOnCameraChangeListener(this);
         mMap.setOnMarkerClickListener(this);
@@ -326,7 +317,7 @@ public class MainActivity extends AppCompatActivity
             mMap.setMyLocationEnabled(true);
         }
 
-        mMap.getUiSettings().setMyLocationButtonEnabled(true);
+        //mMap.getUiSettings().setMyLocationButtonEnabled(true);
 
         mMap.getUiSettings().setAllGesturesEnabled(true);
         mMap.getUiSettings().setCompassEnabled(true);
@@ -335,6 +326,7 @@ public class MainActivity extends AppCompatActivity
         Marker marker = mMap.addMarker(new MarkerOptions()
                 .position(ARB_CENTER));
 
+        Log.d("MAP", "set up trails");
         setupTrails();
         showTrails();
         setupBoundary();
@@ -352,37 +344,13 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onLocationChanged(Location location) {
-//        if (currLocationMarker != null) {
-//            currLocationMarker.remove();
-//        }
-//        latLng = new LatLng(location.getLatitude(), location.getLongitude());
-//        MarkerOptions markerOptions = new MarkerOptions();
-//        markerOptions.position(latLng);
-//        markerOptions.title("Current Position");
-//        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
-//        currLocationMarker = mMap.addMarker(markerOptions);
-//        Snackbar.make(mapFragment.getView(), "location updated: " + location.toString(), Snackbar.LENGTH_LONG).show();
+        Snackbar.make(mapFragment.getView(), "location updated: " + location.toString(), Snackbar.LENGTH_LONG).show();
         mLastLocation = location;
-        if (mCurrLocationMarker != null) {
-            mCurrLocationMarker.remove();
-        }
 
-        //Place current location marker
-        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-        MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.position(latLng);
-        markerOptions.title("Current Position");
-        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
-        mCurrLocationMarker = mMap.addMarker(markerOptions);
-
-        //move map camera
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(11));
-
-        //stop location updates
-        if (mGoogleApiClient != null) {
-            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
-        }
+//        //stop location updates
+//        if (mGoogleApiClient != null) {
+//            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+//        }
     }
 
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
@@ -436,7 +404,7 @@ public class MainActivity extends AppCompatActivity
                         if (mGoogleApiClient == null) {
                             buildGoogleApiClient();
                         }
-                        mMap.setMyLocationEnabled(true);
+                        //mMap.setMyLocationEnabled(true);
                     }
 
                 } else {
@@ -455,7 +423,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onCameraChange(CameraPosition cameraPosition) {
-        Log.d(DEBUG_STRING, "onCameraChange");
 
         double midLatitude = (ARB_AREA.northeast.latitude + ARB_AREA.southwest.latitude) / 2.0;
         double midLongitude = (ARB_AREA.northeast.longitude + ARB_AREA.southwest.longitude) / 2.0;
