@@ -24,11 +24,11 @@ public class ThingsNearby {
     private List mMarkers = new ArrayList<MarkerOptions>();
     private List mNearby = new ArrayList<Marker>(10);
     private List mDistances = new ArrayList();
-    private DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
-    private DatabaseReference mHerbaceousRef = mRootRef.child("herbaceous");
-    private DatabaseReference mWildflowersRef = mRootRef.child("wildflowers");
-    private DatabaseReference mBirdSignsRef = mRootRef.child("bird-signs");
-    private DatabaseReference mHerpSignsRef = mRootRef.child("herp-signs");
+    private DatabaseReference mRootRef;
+    private DatabaseReference mHerbaceousRef;
+    private DatabaseReference mWildflowersRef;
+    private DatabaseReference mBirdSignsRef;
+    private DatabaseReference mHerpSignsRef;
     private ChildEventListener childEventListener = new ChildEventListener() {
         @Override
         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -100,6 +100,12 @@ public class ThingsNearby {
     }
 
     private void setup() {
+        //FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+        mRootRef = FirebaseDatabase.getInstance().getReference();
+        mHerbaceousRef = mRootRef.child("herbaceous");
+        mWildflowersRef = mRootRef.child("wildflowers");
+        mBirdSignsRef = mRootRef.child("bird-signs");
+        mHerpSignsRef = mRootRef.child("herp-signs");
         mHerbaceousRef.addChildEventListener(childEventListener);
         mBirdSignsRef.addChildEventListener(childEventListener);
         mHerpSignsRef.addChildEventListener(childEventListener);

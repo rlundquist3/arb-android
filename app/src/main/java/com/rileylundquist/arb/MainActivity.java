@@ -14,7 +14,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
@@ -40,10 +39,8 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.GoogleMapOptions;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -61,8 +58,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import menu.GuidelinesFragment;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback,
@@ -83,11 +78,12 @@ public class MainActivity extends AppCompatActivity
     protected LocationRequest mLocationRequest;
     protected Location mLastLocation;
 
+
     private DatabaseReference mRootRef;
     private DatabaseReference mBenchesRef;
-    private DatabaseReference mBirdSignsRef;
-    private DatabaseReference mHerbaceousRef;
-    private DatabaseReference mHerpSignsRef;
+//    private DatabaseReference mBirdSignsRef;
+//    private DatabaseReference mHerbaceousRef;
+//    private DatabaseReference mHerpSignsRef;
 
     private final String DEBUG_STRING = "MAP";
     private final LatLng ARB_CENTER = new LatLng(42.293469, -85.701);
@@ -105,6 +101,7 @@ public class MainActivity extends AppCompatActivity
     private boolean trailsOn = false;
     private boolean boundaryOn = false;
     private boolean benchesOn = false;
+    private boolean nearbyOn = false;
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
@@ -166,10 +163,16 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        //FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+
+        mRootRef = FirebaseDatabase.getInstance().getReference();
+        mBenchesRef = mRootRef.child("benches");
 
         buildGoogleApiClient();
 
@@ -190,12 +193,9 @@ public class MainActivity extends AppCompatActivity
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
-        mRootRef = FirebaseDatabase.getInstance().getReference();
-        mBenchesRef = mRootRef.child("benches");
-        mBirdSignsRef = mRootRef.child("bird-signs");
-        mHerbaceousRef = mRootRef.child("herbaceous");
-        mHerpSignsRef = mRootRef.child("herp-signs");
+//        mBirdSignsRef = mRootRef.child("bird-signs");
+//        mHerbaceousRef = mRootRef.child("herbaceous");
+//        mHerpSignsRef = mRootRef.child("herp-signs");
     }
 
     @Override
@@ -276,12 +276,11 @@ public class MainActivity extends AppCompatActivity
                 hideBenches();
             else if (!benches.isEmpty())
                 showBenches();
-        } else if (id == R.id.show_bird_signs) {
-            showCollection("bird_signs");
-        } else if (id == R.id.show_herbaceous) {
-            showCollection("herbaceous");
-        } else if (id == R.id.show_herp_signs) {
-            showCollection("herp_signs");
+        } else if (id == R.id.show_nearby) {
+            if (nearbyOn)
+                hideNearby();
+            else if (!mNearbyMarkers.isEmpty())
+                showNearby();
         } else if (id == R.id.nav_about) {
             goToAbout();
         } else if (id == R.id.nav_guidelines) {
@@ -545,6 +544,10 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onMarkerClick(Marker marker) {
         DetailFragment detailFragment = new DetailFragment();
+        detailFragment.setTitle(marker.getTitle());
+        detailFragment.setDescription(marker.getSnippet());
+        detailFragment.findImage();
+
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.bottom_sheet, detailFragment);
         transaction.addToBackStack(null);
@@ -626,11 +629,6 @@ public class MainActivity extends AppCompatActivity
         currentFragment = Fragments.MAP;
     }
 
-    private void showCollection(String collection) {
-
-
-    }
-
     private void showBenches() {
         for (Object b : benches)
             ((Marker) b).setVisible(true);
@@ -638,6 +636,16 @@ public class MainActivity extends AppCompatActivity
 
     private void hideBenches() {
         for (Object b : benches)
+            ((Marker) b).setVisible(false);
+    }
+
+    private void showNearby() {
+        for (Object b : mNearbyMarkers)
+            ((Marker) b).setVisible(true);
+    }
+
+    private void hideNearby() {
+        for (Object b : mNearbyMarkers)
             ((Marker) b).setVisible(false);
     }
 

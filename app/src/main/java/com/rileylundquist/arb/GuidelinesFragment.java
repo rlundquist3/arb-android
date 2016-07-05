@@ -1,4 +1,4 @@
-package menu;
+package com.rileylundquist.arb;
 
 import android.content.Context;
 import android.net.Uri;
@@ -14,7 +14,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.rileylundquist.arb.R;
 
 /**
  * A simple {@link Fragment} subclass.

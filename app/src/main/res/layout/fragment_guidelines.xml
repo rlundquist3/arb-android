@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:padding="24dp"
     android:background="@color/k_white"
-    tools:context="menu.GuidelinesFragment">
+    tools:context=".GuidelinesFragment">
 
     <TextView
         android:id="@+id/guidelines_text"

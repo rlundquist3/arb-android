@@ -18,24 +18,16 @@
         </menu>
     </item>
 
-    <item android:title="[temp]">
+    <item android:title="What to See">
         <menu>
             <item
                 android:id="@+id/show_benches"
                 android:icon="@drawable/ic_bench_24dp"
                 android:title="Benches" />
             <item
-                android:id="@+id/show_bird_signs"
-                android:icon="@drawable/ic_flight_black_24dp"
-                android:title="Bird Signs" />
-            <item
-                android:id="@+id/show_herp_signs"
+                android:id="@+id/show_nearby"
                 android:icon="@drawable/ic_local_florist_black_24dp"
-                android:title="Herp Signs" />
-            <item
-                android:id="@+id/show_herbaceous"
-                android:icon="@drawable/ic_nature_black_24dp"
-                android:title="Herbaceous" />
+                android:title="Points of Interest" />
         </menu>
     </item>
 

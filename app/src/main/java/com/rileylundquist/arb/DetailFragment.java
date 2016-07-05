@@ -128,22 +128,26 @@ public class DetailFragment extends Fragment {
         void onFragmentInteraction(Uri uri);
     }
 
-    private void setDescription(String text) {
+    public void setDescription(String text) {
         TextView infoView = (TextView) view.findViewById(R.id.detail_info);
         infoView.setText(text);
     }
 
-    private void setTitle(String text) {
-        TextView titleView = (TextView) view.findViewById(R.id.detail_title);
-        titleView.setText(text);
+    public void setTitle(String text) {
+//        TextView titleView = (TextView) view.findViewById(R.id.detail_title);
+//        titleView.setText(text);
     }
 
-    private void setSubtitle(String text) {
+    public void setSubtitle(String text) {
         TextView subtitleView = (TextView) view.findViewById(R.id.detail_subtitle);
         subtitleView.setText(text);
     }
 
-    private void setImage(String image) {
+    public void setImage(String image) {
         switcher.setImageURI(Uri.parse(image));
+    }
+
+    public void findImage() {
+
     }
 }
