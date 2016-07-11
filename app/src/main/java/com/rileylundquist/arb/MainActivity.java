@@ -53,6 +53,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.rileylundquist.arb.dummy.DummyContent;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -66,7 +67,7 @@ public class MainActivity extends AppCompatActivity
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
         AboutFragment.OnFragmentInteractionListener, ContactFragment.OnFragmentInteractionListener,
         DetailFragment.OnFragmentInteractionListener, GuidelinesFragment.OnFragmentInteractionListener,
-        LocationListener {
+        ItemFragment.OnListFragmentInteractionListener, LocationListener {
 
     public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 10000;
     public static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS =
@@ -150,6 +151,11 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onPolylineClick(Polyline polyline) {
+
+    }
+
+    @Override
+    public void onListFragmentInteraction(DummyContent.DummyItem item) {
 
     }
 
