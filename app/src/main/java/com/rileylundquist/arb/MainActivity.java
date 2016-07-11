@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity
     private List mTrailNames = new ArrayList<String>();
     private List boundaryLines = new ArrayList<Polyline>();
     private List benches = new ArrayList<Marker>();
-    private boolean trailsOn = false;
+    private boolean trailsOn = true;
     private boolean boundaryOn = false;
     private boolean benchesOn = false;
     private boolean nearbyOn = false;
@@ -549,12 +549,13 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onMarkerClick(Marker marker) {
         DetailFragment detailFragment = new DetailFragment();
-        detailFragment.setTitle(marker.getTitle());
-        detailFragment.setDescription(marker.getSnippet());
-        detailFragment.findImage();
+
+//        detailFragment.setTitle(marker.getTitle());
+//        detailFragment.setDescription(marker.getSnippet());
+//        detailFragment.findImage();
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.bottom_sheet, detailFragment);
+        transaction.replace(R.id.bottom_sheet, detailFragment.newInstance(marker.getTitle(), marker.getSnippet()));
         transaction.addToBackStack(null);
         transaction.commit();
 

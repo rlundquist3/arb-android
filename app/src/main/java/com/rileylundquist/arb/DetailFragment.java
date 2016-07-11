@@ -3,7 +3,6 @@ package com.rileylundquist.arb;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,15 +23,17 @@ import android.widget.ViewSwitcher;
 public class DetailFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private static final String ARG_TITLE = "title";
+    private static final String ARG_DESCRIPTION = "description";
 
     // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private String mTitle;
+    private String mDescription;
 
-    private View view;
-    private ImageSwitcher switcher;
+    private View mDetailView;
+    private ImageSwitcher mSwitcher;
+    private TextView mTitleView;
+    private TextView mDescriptionView;
 
     private OnFragmentInteractionListener mListener;
 
@@ -49,11 +50,11 @@ public class DetailFragment extends Fragment {
      * @return A new instance of fragment DetailFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static DetailFragment newInstance(String param1, String param2) {
+    public static DetailFragment newInstance(String title, String description) {
         DetailFragment fragment = new DetailFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putString(ARG_TITLE, title);
+        args.putString(ARG_DESCRIPTION, description);
         fragment.setArguments(args);
         return fragment;
     }
@@ -62,8 +63,8 @@ public class DetailFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            mTitle = getArguments().getString(ARG_TITLE);
+            mDescription = getArguments().getString(ARG_DESCRIPTION);
         }
     }
 
@@ -72,10 +73,17 @@ public class DetailFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
 
-        view = inflater.inflate(R.layout.fragment_detail, container, false);
-        switcher = (ImageSwitcher) view.findViewById(R.id.detail_image_switcher);
+        mDetailView = inflater.inflate(R.layout.fragment_detail, container, false);
 
-        switcher.setFactory(new ViewSwitcher.ViewFactory() {
+        mTitleView = (TextView) mDetailView.findViewById(R.id.detail_title);
+        mDescriptionView = (TextView) mDetailView.findViewById(R.id.detail_info);
+
+        mTitleView.setText(mTitle);
+        mDescriptionView.setText(mDescription);
+
+        mSwitcher = (ImageSwitcher) mDetailView.findViewById(R.id.detail_image_switcher);
+
+        mSwitcher.setFactory(new ViewSwitcher.ViewFactory() {
             @Override
             public View makeView() {
                 ImageView imageView = new ImageView(getActivity().getApplicationContext());
@@ -86,7 +94,7 @@ public class DetailFragment extends Fragment {
             }
         });
 
-        return view;
+        return mDetailView;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -129,22 +137,17 @@ public class DetailFragment extends Fragment {
     }
 
     public void setDescription(String text) {
-    //        TextView infoView = (TextView) view.findViewById(R.id.detail_info);
+    //        TextView infoView = (TextView) mDetailView.findViewById(R.id.detail_info);
 //        infoView.setText(text);
     }
 
     public void setTitle(String text) {
-//        TextView titleView = (TextView) view.findViewById(R.id.detail_title);
+//        TextView titleView = (TextView) mDetailView.findViewById(R.id.detail_title);
 //        titleView.setText(text);
     }
 
-    public void setSubtitle(String text) {
-//        TextView subtitleView = (TextView) view.findViewById(R.id.detail_subtitle);
-//        subtitleView.setText(text);
-    }
-
     public void setImage(String image) {
-        switcher.setImageURI(Uri.parse(image));
+        mSwitcher.setImageURI(Uri.parse(image));
     }
 
     public void findImage() {
