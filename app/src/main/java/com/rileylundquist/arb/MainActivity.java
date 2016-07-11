@@ -53,7 +53,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.rileylundquist.arb.dummy.DummyContent;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -155,7 +154,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onListFragmentInteraction(DummyContent.DummyItem item) {
+    public void onListFragmentInteraction(Marker item) {
 
     }
 
@@ -649,7 +648,8 @@ public class MainActivity extends AppCompatActivity
         for (Object b : mNearbyMarkers)
             ((Marker) b).setVisible(true);
 
-        ItemFragment itemFragment = new ItemFragment();
+        mThingsNearby.update(mMap, mLastLocation);
+        ItemFragment itemFragment = new ItemFragment(mNearbyMarkers);
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.bottom_sheet, itemFragment);
@@ -722,5 +722,9 @@ public class MainActivity extends AppCompatActivity
             Log.d(DEBUG_STRING, result);
 
         }
+    }
+
+    public GoogleMap getmMap() {
+        return mMap;
     }
 }

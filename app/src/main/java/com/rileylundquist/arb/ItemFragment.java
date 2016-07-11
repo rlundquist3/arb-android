@@ -1,5 +1,6 @@
 package com.rileylundquist.arb;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -10,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.gms.maps.model.Marker;
 import com.rileylundquist.arb.dummy.DummyContent;
 import com.rileylundquist.arb.dummy.DummyContent.DummyItem;
 
@@ -25,8 +27,10 @@ public class ItemFragment extends Fragment {
 
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
+    private static final String ARG_MARKERS = "markers";
     // TODO: Customize parameters
     private int mColumnCount = 1;
+    private List<Marker> mMarkers;
     private OnListFragmentInteractionListener mListener;
 
     /**
@@ -34,6 +38,11 @@ public class ItemFragment extends Fragment {
      * fragment (e.g. upon screen orientation changes).
      */
     public ItemFragment() {
+    }
+
+    @SuppressLint("ValidFragment")
+    public ItemFragment(List<Marker> markers) {
+        mMarkers = markers;
     }
 
     // TODO: Customize parameter initialization
@@ -45,6 +54,14 @@ public class ItemFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
+
+//    public static ItemFragment newInstance(List<Marker> markers) {
+//        ItemFragment fragment = new ItemFragment();
+//        Bundle args = new Bundle();
+//        args.putParcelable(ARG_MARKERS, markers);
+//        fragment.setArguments(args);
+//        return fragment;
+//    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -64,12 +81,13 @@ public class ItemFragment extends Fragment {
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
             RecyclerView recyclerView = (RecyclerView) view;
+
             if (mColumnCount <= 1) {
                 recyclerView.setLayoutManager(new LinearLayoutManager(context));
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new MyItemRecyclerViewAdapter(DummyContent.ITEMS, mListener));
+            recyclerView.setAdapter(new MyItemRecyclerViewAdapter(DummyContent.ITEMS, mMarkers, mListener));
         }
         return view;
     }
@@ -104,6 +122,6 @@ public class ItemFragment extends Fragment {
      */
     public interface OnListFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onListFragmentInteraction(DummyItem item);
+        void onListFragmentInteraction(Marker item);
     }
 }
