@@ -94,6 +94,7 @@ public class MainActivity extends AppCompatActivity
 
     private ThingsNearby mThingsNearby = new ThingsNearby();
     private List mNearbyMarkers = new ArrayList<Marker>();
+    private List mNearbyDisplayed = new ArrayList<Marker>();
     private List trailLines = new ArrayList<Polyline>();
     private List mTrailNames = new ArrayList<String>();
     private List boundaryLines = new ArrayList<Polyline>();
@@ -284,7 +285,7 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.show_nearby) {
             if (nearbyOn)
                 hideNearby();
-            else if (!mNearbyMarkers.isEmpty())
+            else
                 showNearby();
         } else if (id == R.id.nav_about) {
             goToAbout();
@@ -643,13 +644,14 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void showNearby() {
-        for (Object b : mNearbyMarkers)
+        //mThingsNearby.update(mMap, mLastLocation);
+        mNearbyDisplayed = mNearbyMarkers;
+
+        for (Object b : mNearbyDisplayed)
             ((Marker) b).setVisible(true);
         nearbyOn = true;
 
-        mThingsNearby.update(mMap, mLastLocation);
-        ItemFragment itemFragment = new ItemFragment(mNearbyMarkers);
-
+        ItemFragment itemFragment = new ItemFragment(mNearbyDisplayed);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.bottom_sheet, itemFragment);
         transaction.addToBackStack(null);
@@ -661,13 +663,13 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void hideNearby() {
-        for (Object b : mNearbyMarkers)
+        for (Object b : mNearbyDisplayed)
             ((Marker) b).setVisible(false);
         nearbyOn = false;
 
-        FrameLayout bottomSheet = (FrameLayout) findViewById(R.id.bottom_sheet);
-        BottomSheetBehavior behavior = BottomSheetBehavior.from(bottomSheet);
-        behavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+//        FrameLayout bottomSheet = (FrameLayout) findViewById(R.id.bottom_sheet);
+//        BottomSheetBehavior behavior = BottomSheetBehavior.from(bottomSheet);
+//        behavior.setState(BottomSheetBehavior.STATE_HIDDEN);
     }
 
     private void goToAbout() {
