@@ -642,11 +642,26 @@ public class MainActivity extends AppCompatActivity
     private void showNearby() {
         for (Object b : mNearbyMarkers)
             ((Marker) b).setVisible(true);
+
+        ItemFragment itemFragment = new ItemFragment();
+
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.bottom_sheet, itemFragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
+
+        FrameLayout bottomSheet = (FrameLayout) findViewById(R.id.bottom_sheet);
+        BottomSheetBehavior behavior = BottomSheetBehavior.from(bottomSheet);
+        behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
     }
 
     private void hideNearby() {
         for (Object b : mNearbyMarkers)
             ((Marker) b).setVisible(false);
+
+        FrameLayout bottomSheet = (FrameLayout) findViewById(R.id.bottom_sheet);
+        BottomSheetBehavior behavior = BottomSheetBehavior.from(bottomSheet);
+        behavior.setState(BottomSheetBehavior.STATE_HIDDEN);
     }
 
     private void goToAbout() {

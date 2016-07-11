@@ -129,8 +129,8 @@ public class DetailFragment extends Fragment {
     }
 
     public void setDescription(String text) {
-        TextView infoView = (TextView) view.findViewById(R.id.detail_info);
-        infoView.setText(text);
+    //        TextView infoView = (TextView) view.findViewById(R.id.detail_info);
+//        infoView.setText(text);
     }
 
     public void setTitle(String text) {
@@ -139,8 +139,8 @@ public class DetailFragment extends Fragment {
     }
 
     public void setSubtitle(String text) {
-        TextView subtitleView = (TextView) view.findViewById(R.id.detail_subtitle);
-        subtitleView.setText(text);
+//        TextView subtitleView = (TextView) view.findViewById(R.id.detail_subtitle);
+//        subtitleView.setText(text);
     }
 
     public void setImage(String image) {
