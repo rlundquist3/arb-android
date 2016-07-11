@@ -326,14 +326,8 @@ public class MainActivity extends AppCompatActivity
             mMap.setMyLocationEnabled(true);
         }
 
-        //mMap.getUiSettings().setMyLocationButtonEnabled(true);
-
         mMap.getUiSettings().setAllGesturesEnabled(true);
         mMap.getUiSettings().setCompassEnabled(true);
-
-        //Temporary for testing BottomSheet
-        Marker marker = mMap.addMarker(new MarkerOptions()
-                .position(ARB_CENTER));
 
         setupTrails();
         setupBoundary();
@@ -562,6 +556,7 @@ public class MainActivity extends AppCompatActivity
         FrameLayout bottomSheet = (FrameLayout) findViewById(R.id.bottom_sheet);
         BottomSheetBehavior behavior = BottomSheetBehavior.from(bottomSheet);
         behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        behavior.setPeekHeight(220);
 
         return true;
     }
@@ -638,16 +633,19 @@ public class MainActivity extends AppCompatActivity
     private void showBenches() {
         for (Object b : benches)
             ((Marker) b).setVisible(true);
+        benchesOn = true;
     }
 
     private void hideBenches() {
         for (Object b : benches)
             ((Marker) b).setVisible(false);
+        benchesOn = false;
     }
 
     private void showNearby() {
         for (Object b : mNearbyMarkers)
             ((Marker) b).setVisible(true);
+        nearbyOn = true;
 
         mThingsNearby.update(mMap, mLastLocation);
         ItemFragment itemFragment = new ItemFragment(mNearbyMarkers);
@@ -665,6 +663,7 @@ public class MainActivity extends AppCompatActivity
     private void hideNearby() {
         for (Object b : mNearbyMarkers)
             ((Marker) b).setVisible(false);
+        nearbyOn = false;
 
         FrameLayout bottomSheet = (FrameLayout) findViewById(R.id.bottom_sheet);
         BottomSheetBehavior behavior = BottomSheetBehavior.from(bottomSheet);

@@ -12,8 +12,8 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="120dp"
-            android:padding="24dp"
+            android:layout_height="60dp"
+            android:paddingLeft="24dp"
             android:background="@color/k_green"
             android:gravity="center_vertical">
 
@@ -27,13 +27,6 @@
 
         </RelativeLayout>
 
-        <ImageSwitcher
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:id="@+id/detail_image_switcher">
-
-        </ImageSwitcher>
-
         <TextView
             android:id="@+id/detail_info"
             android:layout_width="match_parent"
@@ -41,6 +34,13 @@
             android:padding="24dp"
             android:text="@string/lorem_ipsum"
             android:textColor="@color/k_grey" />
+
+        <ImageSwitcher
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:id="@+id/detail_image_switcher">
+
+        </ImageSwitcher>
 
     </LinearLayout>
 
