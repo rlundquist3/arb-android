@@ -78,12 +78,8 @@ public class MainActivity extends AppCompatActivity
     protected LocationRequest mLocationRequest;
     protected Location mLastLocation;
 
-
     private DatabaseReference mRootRef;
     private DatabaseReference mBenchesRef;
-//    private DatabaseReference mBirdSignsRef;
-//    private DatabaseReference mHerbaceousRef;
-//    private DatabaseReference mHerpSignsRef;
 
     private final String DEBUG_STRING = "MAP";
     private final LatLng ARB_CENTER = new LatLng(42.293469, -85.701);
@@ -91,6 +87,7 @@ public class MainActivity extends AppCompatActivity
     private final int DEFAULT_ZOOM = 15;
 
     private SupportMapFragment mapFragment;
+
 
     private ThingsNearby mThingsNearby = new ThingsNearby();
     private List mNearbyMarkers = new ArrayList<Marker>();
