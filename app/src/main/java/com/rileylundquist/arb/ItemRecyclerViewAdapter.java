@@ -1,6 +1,5 @@
 package com.rileylundquist.arb;
 
-import android.support.v4.app.ListFragment;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,13 +17,13 @@ import java.util.List;
  * specified {@link OnListFragmentInteractionListener}.
  * TODO: Replace the implementation with code for your data type.
  */
-public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecyclerViewAdapter.ViewHolder> {
+public class ItemRecyclerViewAdapter extends RecyclerView.Adapter<ItemRecyclerViewAdapter.ViewHolder> {
 
     private final List<DummyItem> mValues;
     private final List<Marker> mMarkers;
     private final OnListFragmentInteractionListener mListener;
 
-    public MyItemRecyclerViewAdapter(List<DummyItem> items, List<Marker> markers, OnListFragmentInteractionListener listener) {
+    public ItemRecyclerViewAdapter(List<DummyItem> items, List<Marker> markers, OnListFragmentInteractionListener listener) {
         mValues = items;
         mMarkers = markers;
         mListener = listener;

@@ -624,7 +624,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void showNearby() {
-        //mThingsNearby.update(mMap, mLastLocation);
         mNearbyDisplayed = mNearbyMarkers;
 
         for (Object b : mNearbyDisplayed)
