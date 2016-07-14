@@ -13,7 +13,6 @@ import android.view.ViewGroup;
 
 import com.google.android.gms.maps.model.Marker;
 import com.rileylundquist.arb.dummy.DummyContent;
-import com.rileylundquist.arb.dummy.DummyContent.DummyItem;
 
 import java.util.List;
 
@@ -87,7 +86,7 @@ public class ItemFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new MyItemRecyclerViewAdapter(DummyContent.ITEMS, mMarkers, mListener));
+            recyclerView.setAdapter(new ItemRecyclerViewAdapter(DummyContent.ITEMS, mMarkers, mListener));
         }
         return view;
     }
