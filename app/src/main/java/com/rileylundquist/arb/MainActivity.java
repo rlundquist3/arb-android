@@ -2,7 +2,6 @@ package com.rileylundquist.arb;
 
 import android.Manifest;
 import android.app.SearchManager;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -21,7 +20,6 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -86,8 +84,9 @@ public class MainActivity extends AppCompatActivity
     private final LatLngBounds ARB_AREA = new LatLngBounds(new LatLng(42.285, -85.71), new LatLng(42.30, -85.69));
     private final int DEFAULT_ZOOM = 15;
 
-    private SupportMapFragment mapFragment;
-
+    private SupportMapFragment mMapFragment;
+    private ItemFragment mItemFragment;
+    private FrameLayout mBottomSheet;
 
     private ThingsNearby mThingsNearby = new ThingsNearby();
     private List mNearbyMarkers = new ArrayList<Marker>();
@@ -165,7 +164,7 @@ public class MainActivity extends AppCompatActivity
 
     private Fragments currentFragment = Fragments.MAP;
 
-    private NavigationView navigationView;
+    private NavigationView mNavigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -190,17 +189,24 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
         ImageView logo = (ImageView) findViewById(R.id.arb_logo);
 
-        navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        mNavigationView = (NavigationView) findViewById(R.id.nav_view);
+        mNavigationView.setNavigationItemSelectedListener(this);
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        mapFragment = (SupportMapFragment) getSupportFragmentManager()
+        mMapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+        mMapFragment.getMapAsync(this);
 
-//        mBirdSignsRef = mRootRef.child("bird-signs");
-//        mHerbaceousRef = mRootRef.child("herbaceous");
-//        mHerpSignsRef = mRootRef.child("herp-signs");
+        mItemFragment = new ItemFragment(mNearbyMarkers);
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.bottom_sheet, mItemFragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
+
+        mBottomSheet = (FrameLayout) findViewById(R.id.bottom_sheet);
+        BottomSheetBehavior behavior = BottomSheetBehavior.from(mBottomSheet);
+        behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        behavior.setPeekHeight(220);
     }
 
     @Override
@@ -534,10 +540,11 @@ public class MainActivity extends AppCompatActivity
         transaction.addToBackStack(null);
         transaction.commit();
 
-        FrameLayout bottomSheet = (FrameLayout) findViewById(R.id.bottom_sheet);
-        BottomSheetBehavior behavior = BottomSheetBehavior.from(bottomSheet);
-        behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-        behavior.setPeekHeight(220);
+        BottomSheetBehavior behavior = BottomSheetBehavior.from(mBottomSheet);
+        if (behavior.getState() == BottomSheetBehavior.STATE_HIDDEN) {
+            behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+            behavior.setPeekHeight(220);
+        }
 
         return true;
     }
@@ -630,15 +637,19 @@ public class MainActivity extends AppCompatActivity
             ((Marker) b).setVisible(true);
         nearbyOn = true;
 
-        ItemFragment itemFragment = new ItemFragment(mNearbyDisplayed);
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.bottom_sheet, itemFragment);
-        transaction.addToBackStack(null);
-        transaction.commit();
+        BottomSheetBehavior behavior = BottomSheetBehavior.from(mBottomSheet);
+        if (behavior.getState() == BottomSheetBehavior.STATE_HIDDEN)
+            behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
-        FrameLayout bottomSheet = (FrameLayout) findViewById(R.id.bottom_sheet);
-        BottomSheetBehavior behavior = BottomSheetBehavior.from(bottomSheet);
-        behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+//        ItemFragment itemFragment = new ItemFragment(mNearbyDisplayed);
+//        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+//        transaction.replace(R.id.bottom_sheet, itemFragment);
+//        transaction.addToBackStack(null);
+//        transaction.commit();
+//
+//        FrameLayout bottomSheet = (FrameLayout) findViewById(R.id.bottom_sheet);
+//        BottomSheetBehavior behavior = BottomSheetBehavior.from(bottomSheet);
+//        behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
     }
 
     private void hideNearby() {

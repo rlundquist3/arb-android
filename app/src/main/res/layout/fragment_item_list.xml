@@ -11,4 +11,5 @@
     app:layoutManager="LinearLayoutManager"
     tools:context="com.rileylundquist.arb.ItemFragment"
     tools:listitem="@layout/fragment_item"
-    android:background="@color/white_alpha" />
+    android:background="@color/white_alpha"
+    android:elevation="3dp"/>
