@@ -1,12 +1,16 @@
 package com.rileylundquist.arb;
 
+import android.net.Uri;
+import android.provider.ContactsContract;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.vision.text.Text;
 import com.rileylundquist.arb.ItemFragment.OnListFragmentInteractionListener;
 import com.rileylundquist.arb.dummy.DummyContent.DummyItem;
 
@@ -17,99 +21,73 @@ import java.util.List;
  * specified {@link OnListFragmentInteractionListener}.
  * TODO: Replace the implementation with code for your data type.
  */
-public class ItemRecyclerViewAdapter extends RecyclerView.Adapter<ItemRecyclerViewAdapter.ViewHolder> {
+public class ItemRecyclerViewAdapter extends RecyclerView.Adapter<ItemRecyclerViewAdapter.CardHolder> {
 
-    private final List<DummyItem> mValues;
-    private final List<Marker> mMarkers;
+    private final List<ArbItem> mItems;
     private final OnListFragmentInteractionListener mListener;
 
-    public ItemRecyclerViewAdapter(List<DummyItem> items, List<Marker> markers, OnListFragmentInteractionListener listener) {
-        mValues = items;
-        mMarkers = markers;
+    public ItemRecyclerViewAdapter(List<ArbItem> items, OnListFragmentInteractionListener listener) {
+//        mMarkers = markers;
+        mItems = items;
         mListener = listener;
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public CardHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fragment_item, parent, false);
-        return new ViewHolder(view);
+                .inflate(R.layout.recycler_card, parent, false);
+        return new CardHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
-//        holder.mItem = mValues.get(position);
-//        holder.mIdView.setText(mValues.get(position).id);
-//        holder.mContentView.setText(mValues.get(position).content);
-//
-//        holder.mView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if (null != mListener) {
-//                    // Notify the active callbacks interface (the activity, if the
-//                    // fragment is attached to one) that an item has been selected.
-//                    mListener.onListFragmentInteraction(holder.mItem);
+    public void onBindViewHolder(final CardHolder holder, int position) {
+
+        if (position < mItems.size()) {
+            holder.mItem = mItems.get(position);
+            holder.mName.setText(mItems.get(position).getName());
+            holder.mScientificName.setText(mItems.get(position).getScientificName());
+            holder.mDescription.setText(mItems.get(position).getDescription());
+            holder.mImage.setImageURI(Uri.parse(mItems.get(position).getImage()));
+
+//            holder.mView.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    if (null != mListener) {
+//                        // Notify the active callbacks interface (the activity, if the
+//                        // fragment is attached to one) that an item has been selected.
+//                        mListener.onListFragmentInteraction(holder.mItem);
+//                    }
 //                }
-//            }
-//        });
-
-        if (position < mMarkers.size()) {
-            holder.mItem = mMarkers.get(position);
-            holder.mIdView.setText(mMarkers.get(position).getTitle());
-//            holder.mContentView.setText(mMarkers.get(position).getSnippet());
-
-            holder.mView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (null != mListener) {
-                        // Notify the active callbacks interface (the activity, if the
-                        // fragment is attached to one) that an item has been selected.
-                        mListener.onListFragmentInteraction(holder.mItem);
-                    }
-                }
-            });
+//            });
         }
 
     }
 
     @Override
     public int getItemCount() {
-        return mValues.size();
+        return mItems.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-//        public final View mView;
-//        public final TextView mIdView;
-//        public final TextView mContentView;
-//        public DummyItem mItem;
-//
-//        public ViewHolder(View view) {
-//            super(view);
-//            mView = view;
-//            mIdView = (TextView) view.findViewById(R.id.id);
-//            mContentView = (TextView) view.findViewById(R.id.content);
-//        }
-//
-//        @Override
-//        public String toString() {
-//            return super.toString() + " '" + mContentView.getText() + "'";
-//        }
-//    }
+    public class CardHolder extends RecyclerView.ViewHolder {
         public final View mView;
-        public final TextView mIdView;
-//        public final TextView mContentView;
-        public Marker mItem;
+        public ArbItem mItem;
+        public TextView mName;
+        public TextView mScientificName;
+        public TextView mDescription;
+        public ImageView mImage;
 
-        public ViewHolder(View view) {
+        public CardHolder(View view) {
             super(view);
             mView = view;
-            mIdView = (TextView) view.findViewById(R.id.id);
-//            mContentView = (TextView) view.findViewById(R.id.content);
+            mName = (TextView) view.findViewById(R.id.item_name);
+            mScientificName = (TextView) view.findViewById(R.id.item_scientific_name);
+            mDescription = (TextView) view.findViewById(R.id.item_description);
+            mImage = (ImageView) view.findViewById(R.id.item_image);
         }
 
         @Override
         public String toString() {
-            return super.toString() + " '" + mIdView.getText() + "'";
+            return super.toString() + " '" + mName.getText() + "'";
         }
     }
 }

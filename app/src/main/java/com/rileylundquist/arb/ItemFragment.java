@@ -30,7 +30,11 @@ public class ItemFragment extends Fragment {
     // TODO: Customize parameters
     private int mColumnCount = 1;
     private List<Marker> mMarkers;
+    private List<ArbItem> mItems;
     private OnListFragmentInteractionListener mListener;
+
+    private RecyclerView mNearbyRecyclerView;
+    private RecyclerView mMustSeeRecyclerView;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -40,8 +44,8 @@ public class ItemFragment extends Fragment {
     }
 
     @SuppressLint("ValidFragment")
-    public ItemFragment(List<Marker> markers) {
-        mMarkers = markers;
+    public ItemFragment(List<ArbItem> items) {
+        mItems = items;
     }
 
     // TODO: Customize parameter initialization
@@ -74,20 +78,26 @@ public class ItemFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_item_list, container, false);
+        View view = inflater.inflate(R.layout.main_bottom_sheet, container, false);
 
-        // Set the adapter
-        if (view instanceof RecyclerView) {
-            Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
+//        // Set the adapter
+//        if (view instanceof RecyclerView) {
+//            Context context = view.getContext();
+//            RecyclerView recyclerView = (RecyclerView) view;
+//
+//            if (mColumnCount <= 1) {
+//                recyclerView.setLayoutManager(new LinearLayoutManager(context));
+//            } else {
+//                recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
+//            }
+//            recyclerView.setAdapter(new ItemRecyclerViewAdapter(DummyContent.ITEMS, mMarkers, mListener));
+//        }
 
-            if (mColumnCount <= 1) {
-                recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            } else {
-                recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
-            }
-            recyclerView.setAdapter(new ItemRecyclerViewAdapter(DummyContent.ITEMS, mMarkers, mListener));
-        }
+        mNearbyRecyclerView = (RecyclerView) view.findViewById(R.id.nearby_recycler_view);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+        mNearbyRecyclerView.setLayoutManager(layoutManager);
+        mNearbyRecyclerView.setAdapter(new ItemRecyclerViewAdapter(mItems, mListener));
+
         return view;
     }
 

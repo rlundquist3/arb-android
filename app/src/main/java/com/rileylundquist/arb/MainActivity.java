@@ -84,11 +84,14 @@ public class MainActivity extends AppCompatActivity
     private final LatLngBounds ARB_AREA = new LatLngBounds(new LatLng(42.285, -85.71), new LatLng(42.30, -85.69));
     private final int DEFAULT_ZOOM = 15;
 
+    private final int PEEK_HEIGHT = 220;
+
     private SupportMapFragment mMapFragment;
     private ItemFragment mItemFragment;
     private FrameLayout mBottomSheet;
 
     private ThingsNearby mThingsNearby = new ThingsNearby();
+    private List mNearbyItems = new ArrayList<ArbItem>();
     private List mNearbyMarkers = new ArrayList<Marker>();
     private List mNearbyDisplayed = new ArrayList<Marker>();
     private List trailLines = new ArrayList<Polyline>();
@@ -197,16 +200,16 @@ public class MainActivity extends AppCompatActivity
                 .findFragmentById(R.id.map);
         mMapFragment.getMapAsync(this);
 
-        mItemFragment = new ItemFragment(mNearbyMarkers);
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.bottom_sheet, mItemFragment);
-        transaction.addToBackStack(null);
-        transaction.commit();
-
+//        mItemFragment = new ItemFragment(mNearbyMarkers);
+//        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+//        transaction.replace(R.id.bottom_sheet, mItemFragment);
+//        transaction.addToBackStack(null);
+//        transaction.commit();
+//
         mBottomSheet = (FrameLayout) findViewById(R.id.bottom_sheet);
         BottomSheetBehavior behavior = BottomSheetBehavior.from(mBottomSheet);
-        behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-        behavior.setPeekHeight(220);
+        behavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+        behavior.setPeekHeight(PEEK_HEIGHT);
     }
 
     @Override
@@ -353,12 +356,22 @@ public class MainActivity extends AppCompatActivity
     public void onLocationChanged(Location location) {
         mLastLocation = location;
         mThingsNearby.update(mMap, location);
-        mNearbyMarkers = mThingsNearby.getNearby();
+//        mNearbyMarkers = mThingsNearby.getNearby();
+        mNearbyItems = mThingsNearby.getNearby();
 
-//        //stop location updates
-//        if (mGoogleApiClient != null) {
-//            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
-//        }
+        //Find out how to just update data set
+        mItemFragment = new ItemFragment(mNearbyMarkers);
+
+        BottomSheetBehavior behavior = BottomSheetBehavior.from(mBottomSheet);
+        if (behavior.getState() == BottomSheetBehavior.STATE_HIDDEN) {
+            behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+            behavior.setPeekHeight(PEEK_HEIGHT);
+
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            transaction.replace(R.id.bottom_sheet, mItemFragment);
+            transaction.addToBackStack(null);
+            transaction.commit();
+        }
     }
 
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
@@ -543,7 +556,7 @@ public class MainActivity extends AppCompatActivity
         BottomSheetBehavior behavior = BottomSheetBehavior.from(mBottomSheet);
         if (behavior.getState() == BottomSheetBehavior.STATE_HIDDEN) {
             behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-            behavior.setPeekHeight(220);
+            behavior.setPeekHeight(PEEK_HEIGHT);
         }
 
         return true;
@@ -639,7 +652,7 @@ public class MainActivity extends AppCompatActivity
 
         BottomSheetBehavior behavior = BottomSheetBehavior.from(mBottomSheet);
         if (behavior.getState() == BottomSheetBehavior.STATE_HIDDEN)
-            behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+            behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
 
 //        ItemFragment itemFragment = new ItemFragment(mNearbyDisplayed);
 //        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();

@@ -22,7 +22,8 @@ import java.util.List;
 public class ThingsNearby {
 
     private List mMarkers = new ArrayList<MarkerOptions>();
-    private List mNearby = new ArrayList<Marker>(10);
+    private List mArbItems = new ArrayList<ArbItem>();
+    private List mNearby = new ArrayList<ArbItem>(10);
     private List mDistances = new ArrayList();
     private DatabaseReference mRootRef;
     private DatabaseReference mHerbaceousRef;
@@ -34,11 +35,17 @@ public class ThingsNearby {
         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
             LatLng coords = new LatLng(dataSnapshot.child("Latitude").getValue(Double.class),
                     dataSnapshot.child("Longitude").getValue(Double.class));
-            mMarkers.add(new MarkerOptions().position(coords)
-                    .visible(false)
-                    .title(dataSnapshot.child("Species").getValue(String.class))
-                    .snippet(dataSnapshot.child("Comment").getValue(String.class))
-            );
+            String title = dataSnapshot.child("Title").getValue(String.class);
+            String scientific = dataSnapshot.child("Scientific Name").getValue(String.class);
+            String description = dataSnapshot.child("Comment").getValue(String.class);
+            String photo = dataSnapshot.child("Photo").getValue(String.class);
+            mArbItems.add(new ArbItem(title, scientific, description, coords, photo));
+
+//            mMarkers.add(new MarkerOptions().position(coords)
+//                    .visible(false)
+//                    .title(dataSnapshot.child("Species").getValue(String.class))
+//                    .snippet(dataSnapshot.child("Comment").getValue(String.class))
+//            );
         }
 
         @Override
@@ -86,13 +93,19 @@ public class ThingsNearby {
     public void update(GoogleMap map, Location location) {
         mNearby.clear();
         mDistances.clear();
-        for (int i=0; i<mMarkers.size(); i++) {
-            MarkerOptions item = (MarkerOptions) mMarkers.get(i);
-            mDistances.add(new DistanceItem(i, distance(location, item)));
+
+        for (int i=0; i<mArbItems.size(); i++) {
+            ArbItem item = (ArbItem) mArbItems.get(i);
+            mDistances.add(new DistanceItem(i, distance(location, item.getLocation())));
         }
+
+//        for (int i=0; i<mMarkers.size(); i++) {
+//            MarkerOptions item = (MarkerOptions) mMarkers.get(i);
+//            mDistances.add(new DistanceItem(i, distance(location, item)));
+//        }
         Arrays.sort(new List[]{mDistances});
         for (int i=0; i<10; i++)
-            mNearby.add(map.addMarker((MarkerOptions) mMarkers.get(((DistanceItem) mDistances.get(i)).getIndex())));
+            mNearby.add(mArbItems.get(((DistanceItem) mDistances.get(i)).getIndex()));
     }
 
     public List getNearby() {
@@ -111,12 +124,11 @@ public class ThingsNearby {
         mHerpSignsRef.addChildEventListener(childEventListener);
     }
 
-    private double distance(Location location, MarkerOptions marker) {
+    private double distance(Location location, LatLng itemLocation) {
         LatLng current = new LatLng(location.getLatitude(), location.getLongitude());
-        LatLng item = marker.getPosition();
 
-        return Math.sqrt(Math.pow(item.latitude - current.latitude, 2) +
-                        Math.pow(item.longitude - current.longitude, 2));
+        return Math.sqrt(Math.pow(itemLocation.latitude - current.latitude, 2) +
+                        Math.pow(itemLocation.longitude - current.longitude, 2));
     }
 
     public class DistanceItem {
